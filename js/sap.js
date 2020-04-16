@@ -8,6 +8,7 @@ var SAAgent = null;
 var agentCallback = {
 	onconnect : function(socket) {
 		SASocket = socket;
+		SASocket.setDataReceiveListener(onreceive);
 		console.log("connected to the SAPAndroidClient");
 
 		SASocket.setSocketStatusListener(function(reason) {
@@ -57,7 +58,6 @@ function connect() {
 			console.log("Service connection lost. Reason : [" + reason + "]");
 			disconnect();
 		});
-		SASocket.setDataReceiveListener(onreceive);
 
 		return false;
 	}
