@@ -1,13 +1,20 @@
 <resources>
-	<application name="MyApplication">
-		<serviceProfile id="/org/example/myapp/my_message" name="MyMessage"
-		                role="consumer"  version="1.0">
+	<application name="SAPTizenClient">
+		<serviceProfile
+			id="/org/example/myapp/my_message"
+			name="MyMessage"
+			role="consumer"  version="1.0">
+			
 			<supportedTransports>
 				<transport type="TRANSPORT_BT"/>
 				<transport type="TRANSPORT_WIFI"/>
 			</supportedTransports>
-			<serviceChannel id="110" dataRate="low" priority="low"
-			                reliability="enable">
+			
+			<serviceChannel
+				id="110"
+				dataRate="low"
+				priority="low"
+				reliability="enable">
 			</serviceChannel>
 		</serviceProfile>
 	</application>

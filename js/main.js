@@ -1,27 +1,33 @@
-window.onload = function() {
-	// TODO:: Do your initialization job
+var content_view = null;
 
-	// add eventListener for tizenhwkey
+window.onload = function() {
+	content_view = document.getElementById("content_view");
+
 	document.addEventListener('tizenhwkey', function(e) {
 		if (e.keyName === "back") {
 			try {
-				tizen.application.getCurrentApplication().exit();
+				tizen.application.getCurrentApplication().hide();
+				alert('app is hidden');
 			} catch (ignore) {
+				console.log('problem with "back" button : ' + ignore);
 			}
 		}
 	});
 
-	// Sample code
-	var mainPage = document.querySelector('#main');
+	var sendButton = document.getElementById('send_button');
+	sendButton.addEventListener('click', function() {
+		if (sendMessage('Hello')) {
+			console.log('"Hello" sent to SAPAndroidClient');
+		} else {
 
-	mainPage.addEventListener("click", function() {
-		var contentText = document.querySelector('#content-text');
-
-		contentText.innerHTML = (contentText.innerHTML === "Basic") ? "Tizen" : "Basic";
+		}
 	});
+
+	if (SASocket === null) {
+		connect();
+	}
 };
 
-function createHTML(log_string) {
-	document.getElementById("content_view").innerHTML = log_string;
+function printHTML(log_string) {
+	content_view.innerHTML = log_string;
 }
-
