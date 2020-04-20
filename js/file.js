@@ -99,10 +99,7 @@ function createNewFile(fileCreationCb, fileCreationErrorCb) {
 	}
 }
 
-var count = 0;
-
 function appendLine(line) {
-	count++;
 	if (canWrite) {
 		newFileStream.write(line + "\r\n");
 	}
@@ -117,8 +114,6 @@ function submitFilesToAndroidAgent() {
 				fs.close();
 				if (sendMessage(data)) {
 					console.log('file sent to android agent');
-					console.log('samples : ' + count);
-					count = 0;
 					documentsDir.deleteFile(oldFile.fullPath, function() {
 						console.log('file deleted');
 					}, function() {
