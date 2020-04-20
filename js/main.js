@@ -11,7 +11,7 @@ function startHeartRateCollection() {
 			var timestamp = new Date().getTime();
 			if (hrmInfo.heartRate > 0 && hrmInfo.rRInterval > 0) {
 				appVibrate = false;
-				appendLine(DataSource.TIZEN_RR_INTERVAL + "," + timestamp + "," + hrmInfo.rRInterval + '\r\n' + DataSource.TIZEN_HR + "," + timestamp + "," + hrmInfo.heartRate);
+				appendLine(DataSource.TIZEN_RR_INTERVAL + "," + timestamp + "," + hrmInfo.rRInterval + '\n' + DataSource.TIZEN_HR + "," + timestamp + "," + hrmInfo.heartRate + '\n');
 			} else if (hrmInfo.heartRate <= 0) {
 				tizen.application.launch("WGvCVP8H7a.SAPTizenClient");
 				if (!appVibrate) {

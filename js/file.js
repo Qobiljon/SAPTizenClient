@@ -11,18 +11,28 @@ DataSource = {
 }, fileHeader = "DATA_SOURCE_ID,TIMESTAMP,VALUES,...";
 var newFileStream = null, oldFile = null;
 var canWrite = false;
+var timestamp;
 
 function createNewFile(fileCreationCb, fileCreationErrorCb) {
 	canWrite = false;
+	timestamp = +new Date();
 	if (newFileStream === null) {
-		tizen.filesystem.resolve("documents/new.txt", function(file) {
-			documentsDir.moveTo(file.fullPath, 'documents/old.txt', true, function() {
+		tizen.filesystem.resolve('documents/new.txt', function(file) {
+			documentsDir.moveTo(file.fullPath, 'documents/' + timestamp + '.txt', true, function() {
+				tizen.filesystem.resolve('documents/' + timestamp + '.txt', function(file) {
+					file.openStream('w', function(fs) {
+						fs.write(timestamp);
+						fs.close();
+						console.log('new.txt renamed to ' + timestamp + '.txt');
+					}, function(error) {
+						console.log('openStream error : ' + error.message);
+					});
+				}, null);
 				var newFile = documentsDir.createFile('new.txt');
 				if (newFile !== null) {
-					console.log("new.txt copied to old.txt");
 					newFile.openStream("w", function(fs) {
 						newFileStream = fs;
-						fs.write(fileHeader + "\r\n");
+						fs.write(fileHeader + "\n");
 						canWrite = true;
 						if (fileCreationCb !== null) {
 							fileCreationCb();
@@ -48,7 +58,7 @@ function createNewFile(fileCreationCb, fileCreationErrorCb) {
 				console.log("new.txt file created : " + newFile.fullPath);
 				newFile.openStream("w", function(fs) {
 					newFileStream = fs;
-					fs.write(fileHeader + "\r\n");
+					fs.write(fileHeader + "\n");
 					canWrite = true;
 					if (fileCreationCb !== null) {
 						fileCreationCb();
@@ -69,14 +79,15 @@ function createNewFile(fileCreationCb, fileCreationErrorCb) {
 			}
 		}, 'rw');
 	} else {
+		newFileStream.write(timestamp);
 		newFileStream.close();
-		documentsDir.moveTo('documents/new.txt', 'documents/old.txt', true, function() {
+		documentsDir.moveTo('documents/new.txt', 'documents/' + timestamp + '.txt', true, function() {
+			console.log('new.txt renamed to ' + timestamp + '.txt');
 			var newFile = documentsDir.createFile('new.txt');
 			if (newFile !== null) {
-				console.log("new.txt stored as old.txt");
 				newFile.openStream("w", function(fs) {
 					newFileStream = fs;
-					fs.write(fileHeader + "\r\n");
+					fs.write(fileHeader + "\n");
 					canWrite = true;
 					if (fileCreationCb !== null) {
 						fileCreationCb();
@@ -101,48 +112,36 @@ function createNewFile(fileCreationCb, fileCreationErrorCb) {
 
 function appendLine(line) {
 	if (canWrite) {
-		newFileStream.write(line + "\r\n");
+		newFileStream.write(line + "\n");
 	}
 }
 
 function submitFilesToAndroidAgent() {
 	createNewFile(function() {
-		tizen.filesystem.resolve("documents/old.txt", function(file) {
-			oldFile = file;
-			file.openStream("r", function(fs) {
-				var data = fs.read(oldFile.fileSize);
-				fs.close();
-				if (sendMessage(data)) {
-					console.log('file sent to android agent');
-					documentsDir.deleteFile(oldFile.fullPath, function() {
-						console.log('file deleted');
-					}, function() {
-						console.log('failed to delete the file : ' + files[n].fullPath);
+		documentsDir.listFiles(function(files) {
+			for (var n = 0; n < files.length; n++) {
+				if (files[n].name !== 'new.txt') {
+					files[n].openStream('r', function(fs) {
+						var data = '';
+						while (fs.eof === false) {
+							data += fs.read(100);
+						}
+						var fileName = data.substring(data.length - 13);
+						data = data.substring(0, data.length - 13);
+						if (sendMessage(data)) {
+							documentsDir.deleteFile('documents/' + fileName + '.txt', function() {
+								console.log('file ' + fileName + '.txt has been sent and deleted');
+							}, function(error) {
+								console.log('deleteFile error : ' + error.message);
+							});
+						}
+					}, function(error) {
+						console.log('openStream error : ' + error.message);
 					});
-				} else {
-					console.log('failed to send the file to android agent');
 				}
-			}, function(error) {
-				console.log('openStream error : ' + error.message);
-			});
+			}
 		}, function(error) {
-			console.log('resolve error : ' + error.message + ', filename=old.txt');
+			console.log('listFiles error : ' + error.message);
 		});
 	}, null);
 }
-
-/*
- * function submitFilesToAndroidAgent() { createNewFile();
- * 
- * tizen.filesystem.resolve('documents', function(dir) {
- * dir.listFiles(function(files) { for (var n = 0; n < files.length; n++) { if
- * (files[n] !== currentFile) { files[n].openStream('r', function(fileStream) {
- * var data = fileStream.readFile(files[n], 'utf-8'); if (sendMessage(data)) {
- * dir.deleteFile(files[n].fullPath, onFileDeteleSuccess, onFileDeleteError); }
- * alert('success'); }, function(error) { console.log('Failed to read a file : ' +
- * error.message); alert('failure 1'); }); } } }, function(error) {
- * console.log("The error " + error.message + " occurred when listing the files
- * in the selected folder"); alert('failure 2'); }); }, function(error) {
- * console.log('Failed to load files : ' + error.message); alert('failure 0'); },
- * 'rw'); }
- */
