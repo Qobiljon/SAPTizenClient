@@ -9,20 +9,20 @@ DataSource = {
 	TIZEN_HR : 34,
 	TIZEN_ACCELEROMETER : 37
 }, fileHeader = "DATA_SOURCE_ID,TIMESTAMP,VALUES,...";
-var newFile = null, oldFile = null;
+var newFileStream = null, oldFile = null;
 var canWrite = false;
 
 function createNewFile(fileCreationCb, fileCreationErrorCb) {
 	canWrite = false;
-	if (newFile === null) {
+	if (newFileStream === null) {
 		tizen.filesystem.resolve("documents/new.txt", function(file) {
-			newFile = file;
-			documentsDir.moveTo(newFile.fullPath, 'documents/old.txt', true, function() {
-				newFile = documentsDir.createFile('new.txt');
+			documentsDir.moveTo(file.fullPath, 'documents/old.txt', true, function() {
+				var newFile = documentsDir.createFile('new.txt');
 				if (newFile !== null) {
+					console.log("new.txt copied to old.txt");
 					newFile.openStream("w", function(fs) {
-						fs.write(fileHeader + "\n");
-						console.log("new.txt copied to old.txt");
+						newFileStream = fs;
+						fs.write(fileHeader + "\r\n");
 						canWrite = true;
 						if (fileCreationCb !== null) {
 							fileCreationCb();
@@ -43,11 +43,12 @@ function createNewFile(fileCreationCb, fileCreationErrorCb) {
 				}
 			});
 		}, function(error) {
-			newFile = documentsDir.createFile('new.txt');
+			var newFile = documentsDir.createFile('new.txt');
 			if (newFile !== null) {
+				console.log("new.txt file created : " + newFile.fullPath);
 				newFile.openStream("w", function(fs) {
-					fs.write(fileHeader + "\n");
-					console.log("new.txt file created : " + newFile.fullPath);
+					newFileStream = fs;
+					fs.write(fileHeader + "\r\n");
 					canWrite = true;
 					if (fileCreationCb !== null) {
 						fileCreationCb();
@@ -68,12 +69,14 @@ function createNewFile(fileCreationCb, fileCreationErrorCb) {
 			}
 		}, 'rw');
 	} else {
-		documentsDir.moveTo(newFile.fullPath, 'documents/old.txt', true, function() {
-			newFile = documentsDir.createFile('new.txt');
+		newFileStream.close();
+		documentsDir.moveTo('documents/new.txt', 'documents/old.txt', true, function() {
+			var newFile = documentsDir.createFile('new.txt');
 			if (newFile !== null) {
+				console.log("new.txt stored as old.txt");
 				newFile.openStream("w", function(fs) {
-					fs.write(fileHeader + "\n");
-					console.log("new.txt copied to old.txt");
+					newFileStream = fs;
+					fs.write(fileHeader + "\r\n");
 					canWrite = true;
 					if (fileCreationCb !== null) {
 						fileCreationCb();
@@ -96,13 +99,12 @@ function createNewFile(fileCreationCb, fileCreationErrorCb) {
 	}
 }
 
+var count = 0;
+
 function appendLine(line) {
+	count++;
 	if (canWrite) {
-		newFile.openStream("a", function(fs) {
-			fs.write(line + "\n");
-		}, function(e) {
-			console.log("Error " + e.message);
-		}, "UTF-8");
+		newFileStream.write(line + "\r\n");
 	}
 }
 
@@ -112,8 +114,11 @@ function submitFilesToAndroidAgent() {
 			oldFile = file;
 			file.openStream("r", function(fs) {
 				var data = fs.read(oldFile.fileSize);
+				fs.close();
 				if (sendMessage(data)) {
 					console.log('file sent to android agent');
+					console.log('samples : ' + count);
+					count = 0;
 					documentsDir.deleteFile(oldFile.fullPath, function() {
 						console.log('file deleted');
 					}, function() {

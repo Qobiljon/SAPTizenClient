@@ -2,15 +2,13 @@ var statusText;
 var connectButton;
 var appStatus = false;
 var appVibrate = false;
-var start;
 var documentsDir;
 
 function startHeartRateCollection() {
 	appStatus = true;
 	tizen.ppm.requestPermission("http://tizen.org/privilege/healthinfo", function() {
 		tizen.humanactivitymonitor.start('HRM', function(hrmInfo) {
-			var end = +new Date();
-			var timestamp = end - start;
+			var timestamp = new Date().getTime();
 			if (hrmInfo.heartRate > 0 && hrmInfo.rRInterval > 0) {
 				appVibrate = false;
 				appendLine(DataSource.TIZEN_RR_INTERVAL + "," + timestamp + "," + hrmInfo.rRInterval);
@@ -84,8 +82,6 @@ window.onload = function() {
 	}, function(error) {
 		console.log('resolve permission error : ' + error.message);
 	});
-
-	start = +new Date();
 
 	tizen.power.setScreenStateChangeListener(function(oldState, newState) {
 		if (newState !== "SCREEN_BRIGHT" || !tizen.power.isScreenOn()) {
