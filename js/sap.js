@@ -1,7 +1,5 @@
 const
-ProviderAppName = "SAPAndroidClient";
-const
-CHANNELID = 110;
+ProviderAppName = "SAPAndroidClient", CHANNELID = 110;
 var SASocket = null;
 var SAAgent = null;
 
@@ -10,10 +8,12 @@ var agentCallback = {
 		SASocket = socket;
 		SASocket.setDataReceiveListener(onreceive);
 		console.log("connected to the SAPAndroidClient");
+		setConnectionStatusHTML(true);
 
 		SASocket.setSocketStatusListener(function(reason) {
 			console.log("Connection with SAPAndroidClient lost. Reason : [" + reason + "]");
 			disconnect();
+			setConnectionStatusHTML(false);
 		});
 	},
 	onerror : onerror
@@ -90,11 +90,15 @@ function sendMessage(data) {
 			return false;
 		}
 		SASocket.sendData(CHANNELID, data);
+		return true;
 	} catch (err) {
 		console.log("Failed to send data [" + err.name + "] msg[" + err.message + "]");
+		return false;
 	}
 }
 
 function onreceive(channelId, data) {
-	printHTML(data);
+	if (data.length == 1) {
+		submitFilesToAndroidAgent();
+	}
 }

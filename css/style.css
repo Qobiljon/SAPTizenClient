@@ -23,14 +23,14 @@ body {
 	transform: translate(-50%, -50%);
 }
 
-#content_view {
+#status_text {
 	display: block;
 	
 	text-decoration: none;
-	font-size: 3em;
+	font-size: 2.0em;
 }
 
-#send_button {
+.button {
 	display: block;
 	
 	margin-top: 20px;
@@ -40,7 +40,7 @@ body {
     color: white;
     border: none;
     border-radius: 5px;
-    font-size: 2.5em;
+    font-size: 2em;
     text-decoration: none;
 }
 

@@ -2,7 +2,8 @@
 	<application name="SAPTizenClient">
 		<serviceProfile
 			id="/org/example/myapp/my_message"
-			name="MyMessage"
+			name="SAPTizenClient"
+			autoLaunchAppId="WGvCVP8H7a.SAPTizenClient"
 			role="consumer"  version="1.0">
 			
 			<supportedTransports>
@@ -12,8 +13,8 @@
 			
 			<serviceChannel
 				id="110"
-				dataRate="low"
-				priority="low"
+				dataRate="high"
+				priority="high"
 				reliability="enable">
 			</serviceChannel>
 		</serviceProfile>
