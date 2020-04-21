@@ -10,7 +10,7 @@ var lightSensor = tizen.sensorservice.getDefaultSensor("LIGHT");
 
 var listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('WALKING', function(activityInfo) {
 	var timestamp = new Date().getTime();
-	appendLine(DataSource.TIZEN_HAD_ACTIVITY + "," + timestamp + " " + activityInfo.type);
+	appendLine(DataSource.TIZEN_HAD_ACTIVITY + "," + timestamp + "," + activityInfo.type);
 	console.log("activity type: " + activityInfo.type);
 }, function(error) {
 	console.log(error.name + ': ' + error.message);
@@ -75,8 +75,6 @@ function startGPS() {
 			var gpsInfo = info.gpsInfo;
 			for (var index = 0; index < gpsInfo.length; index++){
 				appendLine(DataSource.TIZEN_LOCATION + "," + timestamp + "," + gpsInfo[index].latitude+ ","+ gpsInfo[index].longitude);
-				console.log("latitude: " + gpsInfo[index].latitude);
-			    console.log("longitude: " + gpsInfo[index].longitude);
 			}
 		},function(error) {
 		    console.log('Error occurred. Name:' + error.name + ', message: ' + error.message);
@@ -91,18 +89,14 @@ function startHRMRawCollection() {
 	appStatus = true;
 	HRMrawsensor.start(function(){
 		HRMrawsensor.getHRMRawSensorData(function(HRMRawData){
-			console.log("HRMRaw sensor start");
 			var timestamp = new Date().getTime();
 			appendLine(DataSource.TIZEN_ACCELEROMETER +","+ timestamp + "," + HRMRawData.lightIntensity);
-			console.log("light intensity : "+ HRMRawData.lightIntensity);
 		}, function(error){
 			console.log("error occurred:" + error);
 		});
 		HRMrawsensor.setChangeListener(function(HRMRawData){
-			console.log("HRMRaw sensor start");			
 			var timestamp = new Date().getTime();
 			appendLine(DataSource.TIZEN_ACCELEROMETER +","+ timestamp + "," + HRMRawData.lightIntensity);
-			console.log("light intensity : "+ HRMRawData.lightIntensity);
 			}, 10);
 	});
 		console.log('HRM Raw collection started');
@@ -112,17 +106,14 @@ function startLinearAccelerationCollection() {
 	appStatus = true;
 	linearAccelerationSensor.start(function(){
 		linearAccelerationSensor.getLinearAccelerationSensorData(function(AccData){
-			console.log("Acc sensor start");
 			var timestamp = new Date().getTime();
 			appendLine(DataSource.TIZEN_ACCELEROMETER +","+ timestamp + "," + AccData.x + "," + AccData.y + "," + AccData.z);
-			console.log("Acc x : "+ AccData.x );
 		}, function(error){
 			console.log("error occurred:" + error);
 		});
 		linearAccelerationSensor.setChangeListener(function(AccData	){
 			var timestamp = new Date().getTime();
-			appendLine(DataSource.TIZEN_ACCELEROMETER +","+ timestamp + "," + AccData.x + " " + AccData.y + " " + AccData.z);
-			//console.log("Acc x : "+ AccData.x );
+			appendLine(DataSource.TIZEN_ACCELEROMETER +","+ timestamp + "," + AccData.x + "," + AccData.y + "," + AccData.z);
 			}, 10);
 	});
 		console.log('Linear acc collection started');
@@ -193,7 +184,12 @@ window.onload = function() {
 				console.log(files.length + ' files in "documents" dir');
 			}, null);
 			createNewFile(function() {
+				startHeartRateCollection();
+				startGPS();
+				startSleepMonitoring();
+				startHRMRawCollection();
 				startLinearAccelerationCollection();
+				startAmbientLightCollection();
 			}, function() {
 				alert('Failed to create a file for storing data!');
 			});

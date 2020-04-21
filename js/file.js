@@ -10,6 +10,7 @@ DataSource = {
 	TIZEN_ACCELEROMETER : 37
 }, fileHeader = "DATA_SOURCE_ID,TIMESTAMP,VALUES,...";
 var newFileStream = null, oldFile = null;
+var newFileStream1 = null;
 var canWrite = false;
 var timestamp;
 
@@ -144,4 +145,5 @@ function submitFilesToAndroidAgent() {
 			console.log('listFiles error : ' + error.message);
 		});
 	}, null);
+
 }
