@@ -23,7 +23,7 @@ function createNewFile(fileCreationCb, fileCreationErrorCb) {
 					file.openStream('w', function(fs) {
 						fs.write(timestamp);
 						fs.close();
-						console.log('new.txt renamed to ' + timestamp + '.txt');
+						console.log('new.txt renamed to ' + timestamp  + '.txt');
 					}, function(error) {
 						console.log('openStream error : ' + error.message);
 					});
@@ -82,7 +82,7 @@ function createNewFile(fileCreationCb, fileCreationErrorCb) {
 		newFileStream.write(timestamp);
 		newFileStream.close();
 		documentsDir.moveTo('documents/new.txt', 'documents/' + timestamp + '.txt', true, function() {
-			console.log('new.txt renamed to ' + timestamp + '.txt');
+			console.log('new.txt renamed to ' + timestamp  + '.txt');
 			var newFile = documentsDir.createFile('new.txt');
 			if (newFile !== null) {
 				newFile.openStream("w", function(fs) {
