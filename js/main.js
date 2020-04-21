@@ -4,32 +4,8 @@ var appStatus = false;
 var appVibrate = false;
 var documentsDir;
 
-var HRMrawsensor = tizen.sensorservice.getDefaultSensor("HRM_RAW");
-var linearAccelerationSensor = tizen.sensorservice.getDefaultSensor("LINEAR_ACCELERATION");
-var lightSensor = tizen.sensorservice.getDefaultSensor("LIGHT");
-
-var listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('WALKING', function(activityInfo) {
-	var timestamp = new Date().getTime();
-	appendLine(DataSource.TIZEN_HAD_ACTIVITY + "," + timestamp + "," + activityInfo.type);
-	console.log("activity type: " + activityInfo.type);
-}, function(error) {
-	console.log(error.name + ': ' + error.message);
-});
-var listenerIdRunning = tizen.humanactivitymonitor.addActivityRecognitionListener('RUNNING', function(activityInfo) {
-	var timestamp = new Date().getTime();
-	appendLine(DataSource.TIZEN_HAD_ACTIVITY + "," + timestamp + "," + activityInfo.type);
-	console.log("activity type: " + activityInfo.type);
-}, function(error) {
-	console.log(error.name + ': ' + error.message);
-});
-var listenerIdStationary = tizen.humanactivitymonitor.addActivityRecognitionListener('STATIONARY', function(activityInfo) {
-	var timestamp = new Date().getTime();
-	appendLine(DataSource.TIZEN_HAD_ACTIVITY + "," + timestamp + "," + activityInfo.type);
-	console.log("activity type: " + activityInfo.type);
-}, function(error) {
-	console.log(error.name + ': ' + error.message);
-	console.log("activity type: " + activityInfo.type);
-});
+var ppgSensor, linearAccelerationSensor, lightSensor;
+var listenerIdWalking, listenerIdRunning, listenerIdStationary;
 
 function startHeartRateCollection() {
 	appStatus = true;
@@ -38,7 +14,8 @@ function startHeartRateCollection() {
 			var timestamp = new Date().getTime();
 			if (hrmInfo.heartRate > 0 && hrmInfo.rRInterval > 0) {
 				appVibrate = false;
-				appendLine(DataSource.TIZEN_RR_INTERVAL + "," + timestamp + "," + hrmInfo.rRInterval + '\n' + DataSource.TIZEN_HR + "," + timestamp + "," + hrmInfo.heartRate + '\n');
+				saveDataSample(rrIntervalDataSource, timestamp + ',' + hrmInfo.rRInterval);
+				saveDataSample(heartRateDataSource, timestamp + ',' + hrmInfo.heartRate);
 			} else if (hrmInfo.heartRate <= 0) {
 				tizen.application.launch("WGvCVP8H7a.SAPTizenClient");
 				if (!appVibrate) {
@@ -49,7 +26,7 @@ function startHeartRateCollection() {
 		});
 		console.log('HRM started');
 	}, function(error) {
-		console.log('failed to start HRM, permission error : ' + error.message);	
+		console.log('failed to start HRM, permission error : ' + error.message);
 	});
 }
 
@@ -58,7 +35,7 @@ function startSleepMonitoring() {
 	tizen.ppm.requestPermission("http://tizen.org/privilege/healthinfo", function() {
 		var timestamp = new Date().getTime();
 		tizen.humanactivitymonitor.start('SLEEP_MONITOR', function(sleepInfo) {
-			appendLine(DataSource.TIZEN_HAD_SLEEP_PATTERN + "," + timestamp + "," + sleepInfo.status);		
+			saveDataSample(sleepDataSource, timestamp + "," + sleepInfo.status);
 			console.log("sleep status: " + sleepInfo.status)
 		});
 		console.log('sleep monitoring started');
@@ -73,12 +50,15 @@ function startGPS() {
 		var timestamp = new Date().getTime();
 		tizen.humanactivitymonitor.start('GPS', function(info) {
 			var gpsInfo = info.gpsInfo;
-			for (var index = 0; index < gpsInfo.length; index++){
-				appendLine(DataSource.TIZEN_LOCATION + "," + timestamp + "," + gpsInfo[index].latitude+ ","+ gpsInfo[index].longitude);
+			for (var index = 0; index < gpsInfo.length; index++) {
+				saveDataSample(locationDataSource, timestamp + "," + gpsInfo[index].latitude + "," + gpsInfo[index].longitude);
 			}
-		},function(error) {
-		    console.log('Error occurred. Name:' + error.name + ', message: ' + error.message);
-		},{callbackInterval: 150000, sampleInterval: 1000});
+		}, function(error) {
+			console.log('Error occurred. Name:' + error.name + ', message: ' + error.message);
+		}, {
+			callbackInterval : 150000,
+			sampleInterval : 1000
+		});
 		console.log('gps started');
 	}, function(error) {
 		console.log('failed to start GPS monitoring, permission error : ' + error.message);
@@ -87,57 +67,84 @@ function startGPS() {
 
 function startHRMRawCollection() {
 	appStatus = true;
-	HRMrawsensor.start(function(){
-		HRMrawsensor.getHRMRawSensorData(function(HRMRawData){
+	ppgSensor = tizen.sensorservice.getDefaultSensor("HRM_RAW");
+	ppgSensor.start(function() {
+		ppgSensor.getHRMRawSensorData(function(ppgData) {
 			var timestamp = new Date().getTime();
-			appendLine(DataSource.TIZEN_ACCELEROMETER +","+ timestamp + "," + HRMRawData.lightIntensity);
-		}, function(error){
+			saveDataSample(accelerometerDataSource, timestamp + "," + ppgData.lightIntensity);
+		}, function(error) {
 			console.log("error occurred:" + error);
 		});
-		HRMrawsensor.setChangeListener(function(HRMRawData){
+		ppgSensor.setChangeListener(function(ppgData) {
 			var timestamp = new Date().getTime();
-			appendLine(DataSource.TIZEN_ACCELEROMETER +","+ timestamp + "," + HRMRawData.lightIntensity);
-			}, 10);
+			saveDataSample(accelerometerDataSource, timestamp + "," + ppgData.lightIntensity);
+		}, 10);
 	});
-		console.log('HRM Raw collection started');
+	console.log('HRM Raw collection started');
 }
 
 function startLinearAccelerationCollection() {
 	appStatus = true;
-	linearAccelerationSensor.start(function(){
-		linearAccelerationSensor.getLinearAccelerationSensorData(function(AccData){
+	linearAccelerationSensor = tizen.sensorservice.getDefaultSensor("LINEAR_ACCELERATION");
+	linearAccelerationSensor.start(function() {
+		linearAccelerationSensor.getLinearAccelerationSensorData(function(AccData) {
 			var timestamp = new Date().getTime();
-			appendLine(DataSource.TIZEN_ACCELEROMETER +","+ timestamp + "," + AccData.x + "," + AccData.y + "," + AccData.z);
-		}, function(error){
+			saveDataSample(accelerometerDataSource, timestamp + "," + AccData.x + "," + AccData.y + "," + AccData.z);
+		}, function(error) {
 			console.log("error occurred:" + error);
 		});
-		linearAccelerationSensor.setChangeListener(function(AccData	){
+		linearAccelerationSensor.setChangeListener(function(AccData) {
 			var timestamp = new Date().getTime();
-			appendLine(DataSource.TIZEN_ACCELEROMETER +","+ timestamp + "," + AccData.x + "," + AccData.y + "," + AccData.z);
-			}, 10);
+			saveDataSample(accelerometerDataSource, timestamp + "," + AccData.x + "," + AccData.y + "," + AccData.z);
+		}, 10);
 	});
-		console.log('Linear acc collection started');
+	console.log('Linear acc collection started');
 }
 
 function startAmbientLightCollection() {
 	appStatus = true;
-	lightSensor.start(function(){
-		lightSensor.getLightSensorData (function(LightData){
+	lightSensor = tizen.sensorservice.getDefaultSensor("LIGHT");
+	lightSensor.start(function() {
+		lightSensor.getLightSensorData(function(LightData) {
 			var timestamp = new Date().getTime();
-			appendLine(DataSource.TIZEN_AMBIENT_LIGHT +","+ timestamp + "," + LightData.lightLevel);
-			console.log("Ambient light level : "+ LightData.lightLevel );
-		}, function(error){
+			saveDataSample(ambientLightDataSource, timestamp + "," + LightData.lightLevel);
+			console.log("Ambient light level : " + LightData.lightLevel);
+		}, function(error) {
 			console.log("error occurred:" + error);
 		});
-		lightSensor.setChangeListener(function(LightData){
+		lightSensor.setChangeListener(function(LightData) {
 			var timestamp = new Date().getTime();
-			appendLine(DataSource.TIZEN_AMBIENT_LIGHT +","+ timestamp + "," + LightData.lightLevel);
-			//console.log("Ambient light level : "+ LightData.lightLevel );
-			}, 10);
+			saveDataSample(ambientLightDataSource, timestamp + "," + LightData.lightLevel);
+			// console.log("Ambient light level : "+ LightData.lightLevel );
+		}, 10);
 	});
-		console.log('Ambient light sensor start');
+	console.log('Ambient light sensor start');
 }
 
+function startActivityDetection() {
+	listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('WALKING', function(activityInfo) {
+		var timestamp = new Date().getTime();
+		saveDataSample(activityDataSource, timestamp + "," + activityInfo.type);
+		console.log("activity type: " + activityInfo.type);
+	}, function(error) {
+		console.log(error.name + ': ' + error.message);
+	});
+	listenerIdRunning = tizen.humanactivitymonitor.addActivityRecognitionListener('RUNNING', function(activityInfo) {
+		var timestamp = new Date().getTime();
+		saveDataSample(activityDataSource, timestamp + "," + activityInfo.type);
+		console.log("activity type: " + activityInfo.type);
+	}, function(error) {
+		console.log(error.name + ': ' + error.message);
+	});
+	listenerIdStationary = tizen.humanactivitymonitor.addActivityRecognitionListener('STATIONARY', function(activityInfo) {
+		var timestamp = new Date().getTime();
+		saveDataSample(activityDataSource, timestamp + "," + activityInfo.type);
+		console.log("activity type: " + activityInfo.type);
+	}, function(error) {
+		console.log(error.name + ': ' + error.message);
+		console.log("activity type: " + activityInfo.type);
+	});
+}
 
 window.onload = function() {
 	window.addEventListener('tizenhwkey', function(ev) {
@@ -176,20 +183,19 @@ window.onload = function() {
 
 	// acquire permissions and start data collection
 	tizen.ppm.requestPermission("http://tizen.org/privilege/mediastorage", function() {
-		// console.log('permission acquired');
 		tizen.filesystem.resolve("documents", function(dir) {
 			documentsDir = dir;
-			// console.log('dir resolved : ' + dir.path);
 			dir.listFiles(function(files) {
 				console.log(files.length + ' files in "documents" dir');
 			}, null);
-			createNewFile(function() {
+			cacheFiles(function() {
 				startHeartRateCollection();
-				startGPS();
-				startSleepMonitoring();
-				startHRMRawCollection();
-				startLinearAccelerationCollection();
-				startAmbientLightCollection();
+				// startGPS();
+				// startSleepMonitoring();
+				// startHRMRawCollection();
+				// startLinearAccelerationCollection();
+				// startAmbientLightCollection();
+				// startActivityDetection();
 			}, function() {
 				alert('Failed to create a file for storing data!');
 			});
