@@ -1,25 +1,25 @@
-var locationFilename = 'location.txt', locationDataSource = 31, locationCanWrite = false, locationFilestream = {
+var locationFilename = 'location.txt', locationDataSource = 31, locationCanWrite = false, locationSending = false, locationFilestream = {
 	value : null
 };
-var rrIntervalFilename = 'rrInterval.txt', rrIntervalDataSource = 35, rrIntervalCanWrite = false, rrIntervalFilestream = {
+var rrIntervalFilename = 'rrInterval.txt', rrIntervalDataSource = 35, rrIntervalCanWrite = false, rrIntervalSending = false, rrIntervalFilestream = {
 	value : null
 };
-var ppgFilename = 'ppgLightIntensity.txt', ppgDataSource = 32, ppgCanWrite = false, ppgFilestream = {
+var ppgFilename = 'ppgLightIntensity.txt', ppgDataSource = 32, ppgCanWrite = false, ppgSending = false, ppgFilestream = {
 	value : null
 };
-var activityFilename = 'activity.txt', activityDataSource = 33, activityCanWrite = false, activityFilestream = {
+var activityFilename = 'activity.txt', activityDataSource = 33, activityCanWrite = false, activitySending = false, activityFilestream = {
 	value : null
 };
-var sleepFilename = 'sleep.txt', sleepDataSource = 36, sleepCanWrite = false, sleepFilestream = {
+var sleepFilename = 'sleep.txt', sleepDataSource = 36, sleepCanWrite = false, sleepSending = false, sleepFilestream = {
 	value : null
 };
-var ambientLightFilename = 'ambientLight.txt', ambientLightDataSource = 38, ambientLightCanWrite = false, ambientLightFilestream = {
+var ambientLightFilename = 'ambientLight.txt', ambientLightDataSource = 38, ambientLightCanWrite = false, ambientLightSending = false, ambientLightFilestream = {
 	value : null
 };
-var heartRateFilename = 'heartRate.txt', heartRateDataSource = 34, heartRateCanWrite = false, heartRateFilestream = {
+var heartRateFilename = 'heartRate.txt', heartRateDataSource = 34, heartRateCanWrite = false, heartRateSending = false, heartRateFilestream = {
 	value : null
 };
-var accelerometerFilename = 'accelerometer.txt', accelerometerDataSource = 37, accelerometerCanWrite = false, accelerometerFilestream = {
+var accelerometerFilename = 'accelerometer.txt', accelerometerDataSource = 37, accelerometerCanWrite = false, accelerometerSending = false, accelerometerFilestream = {
 	value : null
 };
 
@@ -266,8 +266,10 @@ function submitLocations() {
 	locationCanWrite = false;
 	locationFilestream.value.close();
 	documentsDir.moveTo('documents/' + locationFilename, 'documents/old_' + locationFilename, true, function() {
+		bindLocation();
 		tizen.filesystem.resolve('documents/old_' + locationFilename, function(file) {
 			file.readAsText(function(str) {
+				locationSending = true;
 				if (str.length === 0 || sendMessage(str)) {
 					documentsDir.deleteFile('documents/old_' + locationFilename, function() {
 						console.log('old_' + locationFilename + ' deleted');
@@ -275,7 +277,7 @@ function submitLocations() {
 						console.log('failed to delete ' + locationFilename + ', error : ' + e.message);
 					});
 				}
-				bindLocation();
+				locationSending = false;
 			}, null, 'UTF-8');
 		}, null);
 	}, function(error) {
@@ -288,8 +290,10 @@ function submitRrInterval() {
 	rrIntervalCanWrite = false;
 	rrIntervalFilestream.value.close();
 	documentsDir.moveTo('documents/' + rrIntervalFilename, 'documents/old_' + rrIntervalFilename, true, function() {
+		bindRrInterval();
 		tizen.filesystem.resolve('documents/old_' + rrIntervalFilename, function(file) {
 			file.readAsText(function(str) {
+				rrIntervalSending = true;
 				if (str.length === 0 || sendMessage(str)) {
 					documentsDir.deleteFile('documents/old_' + rrIntervalFilename, function() {
 						console.log('old_' + rrIntervalFilename + ' deleted');
@@ -297,7 +301,7 @@ function submitRrInterval() {
 						console.log('failed to delete ' + rrIntervalFilename + ', error : ' + e.message);
 					});
 				}
-				bindRrInterval();
+				rrIntervalSending = false;
 			}, null, 'UTF-8');
 		}, null);
 	}, function(error) {
@@ -306,12 +310,14 @@ function submitRrInterval() {
 	});
 }
 function submitPPG() {
-	// 3. ppgLightIntensity
+	// 3. ppg
 	ppgCanWrite = false;
 	ppgFilestream.value.close();
 	documentsDir.moveTo('documents/' + ppgFilename, 'documents/old_' + ppgFilename, true, function() {
+		bindPpg();
 		tizen.filesystem.resolve('documents/old_' + ppgFilename, function(file) {
 			file.readAsText(function(str) {
+				ppgSending = true;
 				if (str.length === 0 || sendMessage(str)) {
 					documentsDir.deleteFile('documents/old_' + ppgFilename, function() {
 						console.log('old_' + ppgFilename + ' deleted');
@@ -319,7 +325,7 @@ function submitPPG() {
 						console.log('failed to delete ' + ppgFilename + ', error : ' + e.message);
 					});
 				}
-				bindPpg();
+				ppgSending = false;
 			}, null, 'UTF-8');
 		}, null);
 	}, function(error) {
@@ -332,8 +338,10 @@ function submitActivity() {
 	activityCanWrite = false;
 	activityFilestream.value.close();
 	documentsDir.moveTo('documents/' + activityFilename, 'documents/old_' + activityFilename, true, function() {
+		bindActivity();
 		tizen.filesystem.resolve('documents/old_' + activityFilename, function(file) {
 			file.readAsText(function(str) {
+				activitySending = true;
 				if (str.length === 0 || sendMessage(str)) {
 					documentsDir.deleteFile('documents/old_' + activityFilename, function() {
 						console.log('old_' + activityFilename + ' deleted');
@@ -341,7 +349,7 @@ function submitActivity() {
 						console.log('failed to delete ' + activityFilename + ', error : ' + e.message);
 					});
 				}
-				bindActivity();
+				activitySending = false;
 			}, null, 'UTF-8');
 		}, null);
 	}, function(error) {
@@ -354,8 +362,10 @@ function submitSleep() {
 	sleepCanWrite = false;
 	sleepFilestream.value.close();
 	documentsDir.moveTo('documents/' + sleepFilename, 'documents/old_' + sleepFilename, true, function() {
+		bindSleep();
 		tizen.filesystem.resolve('documents/old_' + sleepFilename, function(file) {
 			file.readAsText(function(str) {
+				sleepSending = true;
 				if (str.length === 0 || sendMessage(str)) {
 					documentsDir.deleteFile('documents/old_' + sleepFilename, function() {
 						console.log('old_' + sleepFilename + ' deleted');
@@ -363,7 +373,7 @@ function submitSleep() {
 						console.log('failed to delete ' + sleepFilename + ', error : ' + e.message);
 					});
 				}
-				bindSleep();
+				sleepSending = false;
 			}, null, 'UTF-8');
 		}, null);
 	}, function(error) {
@@ -376,8 +386,10 @@ function submitAmbientLight() {
 	ambientLightCanWrite = false;
 	ambientLightFilestream.value.close();
 	documentsDir.moveTo('documents/' + ambientLightFilename, 'documents/old_' + ambientLightFilename, true, function() {
+		bindAmbientLight();
 		tizen.filesystem.resolve('documents/old_' + ambientLightFilename, function(file) {
 			file.readAsText(function(str) {
+				ambientLightSending = true;
 				if (str.length === 0 || sendMessage(str)) {
 					documentsDir.deleteFile('documents/old_' + ambientLightFilename, function() {
 						console.log('old_' + ambientLightFilename + ' deleted');
@@ -385,7 +397,7 @@ function submitAmbientLight() {
 						console.log('failed to delete ' + ambientLightFilename + ', error : ' + e.message);
 					});
 				}
-				bindAmbientLight();
+				ambientLightSending = false;
 			}, null, 'UTF-8');
 		}, null);
 	}, function(error) {
@@ -398,8 +410,10 @@ function submitHeartRate() {
 	heartRateCanWrite = false;
 	heartRateFilestream.value.close();
 	documentsDir.moveTo('documents/' + heartRateFilename, 'documents/old_' + heartRateFilename, true, function() {
+		bindHeartRate();
 		tizen.filesystem.resolve('documents/old_' + heartRateFilename, function(file) {
 			file.readAsText(function(str) {
+				heartRateSending = true;
 				if (str.length === 0 || sendMessage(str)) {
 					documentsDir.deleteFile('documents/old_' + heartRateFilename, function() {
 						console.log('old_' + heartRateFilename + ' deleted');
@@ -407,7 +421,7 @@ function submitHeartRate() {
 						console.log('failed to delete ' + heartRateFilename + ', error : ' + e.message);
 					});
 				}
-				bindHeartRate();
+				heartRateSending = false;
 			}, null, 'UTF-8');
 		}, null);
 	}, function(error) {
@@ -420,8 +434,10 @@ function submitAccelerometer() {
 	accelerometerCanWrite = false;
 	accelerometerFilestream.value.close();
 	documentsDir.moveTo('documents/' + accelerometerFilename, 'documents/old_' + accelerometerFilename, true, function() {
+		bindAccelerometer();
 		tizen.filesystem.resolve('documents/old_' + accelerometerFilename, function(file) {
 			file.readAsText(function(str) {
+				accelerometerSending = true;
 				if (str.length === 0 || sendMessage(str)) {
 					documentsDir.deleteFile('documents/old_' + accelerometerFilename, function() {
 						console.log('old_' + accelerometerFilename + ' deleted');
@@ -429,7 +445,7 @@ function submitAccelerometer() {
 						console.log('failed to delete ' + accelerometerFilename + ', error : ' + e.message);
 					});
 				}
-				bindAccelerometer();
+				accelerometerSending = false;
 			}, null, 'UTF-8');
 		}, null);
 	}, function(error) {
@@ -439,14 +455,30 @@ function submitAccelerometer() {
 }
 // submitting all data sources
 function submitFilesToAndroidAgent() {
-	submitLocations();
-	submitRrInterval();
-	submitPPG();
-	submitActivity();
-	submitSleep();
-	submitAmbientLight();
-	submitHeartRate();
-	submitAccelerometer();
+	if (!locationSending) {
+		submitLocations();
+	}
+	if (!rrIntervalSending) {
+		submitRrInterval();
+	}
+	if (!ppgSending) {
+		submitPPG();
+	}
+	if (!activitySending) {
+		submitActivity();
+	}
+	if (!sleepSending) {
+		submitSleep();
+	}
+	if (!ambientLightSending) {
+		submitAmbientLight();
+	}
+	if (!heartRateSending) {
+		submitHeartRate();
+	}
+	if (!accelerometerSending) {
+		submitAccelerometer();
+	}
 }
 
 // saving a sampled data
