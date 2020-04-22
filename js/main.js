@@ -18,10 +18,10 @@ function startHeartRateCollection() {
 			saveHeartRateSample(timestamp + ',' + hrmInfo.heartRate);
 		} else if (hrmInfo.heartRate <= 0) {
 			tizen.application.launch("WGvCVP8H7a.SAPTizenClient");
-			if (!appVibrate) {
+			/*if (!appVibrate) {
 				appVibrate = true;
 				navigator.vibrate(700);
-			}
+			}*/
 		}
 	});
 	console.log('HRM started');
@@ -81,7 +81,7 @@ function startLinearAccelerationCollection() {
 		linearAccelerationSensor.setChangeListener(function(AccData) {
 			var timestamp = new Date().getTime();
 			saveAccelerometerSample(timestamp + "," + AccData.x + "," + AccData.y + "," + AccData.z);
-		}, 10);
+		}, 50);
 	});
 	console.log('Linear acc collection started');
 }
