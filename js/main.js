@@ -194,7 +194,7 @@ window.onload = function() {
 	tizen.power.setScreenStateChangeListener(function(oldState, newState) {
 		if (newState !== "SCREEN_BRIGHT" || !tizen.power.isScreenOn()) {
 			tizen.power.turnScreenOn();
-			// tizen.power.setScreenBrightness(10);
+			tizen.power.setScreenBrightness(1);
 		}
 	});
 };
