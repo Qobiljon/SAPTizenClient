@@ -1,22 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <resources>
-	<application name="SAPTizenClient">
-		<serviceProfile
-			id="/org/example/myapp/my_message"
-			name="SAPTizenClient"
-			autoLaunchAppId="WGvCVP8H7a.SAPTizenClient"
-			role="consumer"  version="1.0">
-			
-			<supportedTransports>
-				<transport type="TRANSPORT_BT"/>
-				<transport type="TRANSPORT_WIFI"/>
-			</supportedTransports>
-			
-			<serviceChannel
-				id="110"
-				dataRate="high"
-				priority="high"
-				reliability="enable">
-			</serviceChannel>
-		</serviceProfile>
-	</application>
+    
+    <application name="SAPTizenClient" >
+    
+        <serviceProfile
+            id="/sample/hello"
+            name="SAPTizenClient"
+            autoLaunchAppId="WGvCVP8H7a.SAPTizenClient"
+            role="consumer"
+            version="1.0" >
+    
+            <supportedTransports>
+                <transport type="TRANSPORT_BT" />
+                <transport type="TRANSPORT_WIFI"/>
+            </supportedTransports>
+    
+            <serviceChannel
+                id="104"
+                dataRate="high"
+                priority="high"
+                reliability="enable" >
+    
+            </serviceChannel>
+    
+        </serviceProfile>
+    
+    </application>
+    
 </resources>

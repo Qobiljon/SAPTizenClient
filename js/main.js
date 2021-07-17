@@ -7,7 +7,6 @@ var appStatus = false;
 var appVibrate = false;
 var documentsDir;
 
-// sensing (each data source separately)
 function startHeartRateCollection() {
 	appStatus = true;
 	tizen.humanactivitymonitor.start('HRM', function(hrmInfo) {
@@ -15,43 +14,14 @@ function startHeartRateCollection() {
 		if (hrmInfo.heartRate > 0 && hrmInfo.rRInterval > 0) {
 			appVibrate = false;
 			saveRRIntervalSample(timestamp + ',' + hrmInfo.rRInterval);
-			saveHeartRateSample(timestamp + ',' + hrmInfo.heartRate);
 		} else if (hrmInfo.heartRate <= 0) {
 			tizen.application.launch("WGvCVP8H7a.SAPTizenClient");
-			/*if (!appVibrate) {
-				appVibrate = true;
-				navigator.vibrate(700);
-			}*/
+			/*
+			 * if (!appVibrate) { appVibrate = true; navigator.vibrate(700); }
+			 */
 		}
 	});
 	console.log('HRM started');
-}
-function startSleepMonitoring() {
-	var timestamp = new Date().getTime();
-	tizen.humanactivitymonitor.start('SLEEP_MONITOR', function(sleepInfo) {
-		saveSleepSample(timestamp + "," + sleepInfo.status);
-		console.log("sleep status: " + sleepInfo.status)
-	});
-	console.log('sleep monitoring started');
-}
-function startGPS() {
-	tizen.ppm.requestPermission("http://tizen.org/privilege/location", function() {
-		var timestamp = new Date().getTime();
-		tizen.humanactivitymonitor.start('GPS', function(info) {
-			var gpsInfo = info.gpsInfo;
-			for (var index = 0; index < gpsInfo.length; index++) {
-				saveLocationSample(timestamp + "," + gpsInfo[index].latitude + "," + gpsInfo[index].longitude);
-			}
-		}, function(error) {
-			console.log('Error occurred. Name:' + error.name + ', message: ' + error.message);
-		}, {
-			callbackInterval : 150000,
-			sampleInterval : 1000
-		});
-		console.log('gps started');
-	}, function(error) {
-		console.log('failed to start GPS monitoring, permission error : ' + error.message);
-	});
 }
 function startHRMRawCollection() {
 	ppgSensor = tizen.sensorservice.getDefaultSensor("HRM_RAW");
@@ -70,20 +40,74 @@ function startHRMRawCollection() {
 	console.log('HRM Raw collection started');
 }
 function startLinearAccelerationCollection() {
-	linearAccelerationSensor = tizen.sensorservice.getDefaultSensor("LINEAR_ACCELERATION");
+	linearAccelerationSensor = tizen.sensorservice
+			.getDefaultSensor("LINEAR_ACCELERATION");
 	linearAccelerationSensor.start(function() {
-		linearAccelerationSensor.getLinearAccelerationSensorData(function(AccData) {
+		linearAccelerationSensor.getLinearAccelerationSensorData(function(
+				AccData) {
 			var timestamp = new Date().getTime();
-			saveAccelerometerSample(timestamp + "," + AccData.x + "," + AccData.y + "," + AccData.z);
+			saveAccelerometerSample(timestamp + "," + AccData.x + ","
+					+ AccData.y + "," + AccData.z);
 		}, function(error) {
 			console.log("error occurred:" + error);
 		});
 		linearAccelerationSensor.setChangeListener(function(AccData) {
 			var timestamp = new Date().getTime();
-			saveAccelerometerSample(timestamp + "," + AccData.x + "," + AccData.y + "," + AccData.z);
+			saveAccelerometerSample(timestamp + "," + AccData.x + ","
+					+ AccData.y + "," + AccData.z);
 		}, 50);
 	});
 	console.log('Linear acc collection started');
+}
+function startGPS() {
+	tizen.ppm
+			.requestPermission(
+					"http://tizen.org/privilege/location",
+					function() {
+						var timestamp = new Date().getTime();
+						var count = 1;
+						var average = 0;
+						tizen.humanactivitymonitor
+								.start(
+										'GPS',
+										function(info) {
+											var gpsInfo = info.gpsInfo;
+											var newTimestamp = new Date()
+													.getTime();
+											var delta = newTimestamp
+													- timestamp;
+											average = ((count - 1) / count)
+													* average + delta / count;
+											timestamp = newTimestamp;
+											for (var index = 0; index < gpsInfo.length; index++) {
+												saveLocationSample(timestamp
+														+ ","
+														+ gpsInfo[index].latitude
+														+ ","
+														+ gpsInfo[index].longitude);
+												statusText.innerHTML = "("
+														+ count + ") " + delta
+														+ " ms<br>"
+														+ Math.round(average)
+														+ " ms";
+											}
+											count += 1;
+										}, function(error) {
+											console.log('Error occurred. Name:'
+													+ error.name
+													+ ', message: '
+													+ error.message);
+										}, {
+											callbackInterval : 3000,
+											sampleInterval : 1000
+										});
+						console.log('gps started');
+					},
+					function(error) {
+						console
+								.log('failed to start GPS monitoring, permission error : '
+										+ error.message);
+					});
 }
 function startAmbientLightCollection() {
 	lightSensor = tizen.sensorservice.getDefaultSensor("LIGHT");
@@ -104,63 +128,80 @@ function startAmbientLightCollection() {
 	console.log('Ambient light sensor start');
 }
 function startActivityDetection() {
-	listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('WALKING', function(activityInfo) {
-		var timestamp = new Date().getTime();
-		saveActivitySample(timestamp + "," + activityInfo.type);
-		console.log("activity type: " + activityInfo.type);
-	}, function(error) {
-		console.log(error.name + ': ' + error.message);
-	});
-	listenerIdRunning = tizen.humanactivitymonitor.addActivityRecognitionListener('RUNNING', function(activityInfo) {
-		var timestamp = new Date().getTime();
-		saveActivitySample(timestamp + "," + activityInfo.type);
-		console.log("activity type: " + activityInfo.type);
-	}, function(error) {
-		console.log(error.name + ': ' + error.message);
-	});
-	listenerIdStationary = tizen.humanactivitymonitor.addActivityRecognitionListener('STATIONARY', function(activityInfo) {
-		var timestamp = new Date().getTime();
-		saveActivitySample(timestamp + "," + activityInfo.type);
-		console.log("activity type: " + activityInfo.type);
-	}, function(error) {
-		console.log(error.name + ': ' + error.message);
-		console.log("activity type: " + activityInfo.type);
-	});
+	listenerIdWalking = tizen.humanactivitymonitor
+			.addActivityRecognitionListener('WALKING', function(activityInfo) {
+				var timestamp = new Date().getTime();
+				saveActivitySample(timestamp + "," + activityInfo.type);
+				console.log("activity type: " + activityInfo.type);
+			}, function(error) {
+				console.log(error.name + ': ' + error.message);
+			});
+	listenerIdRunning = tizen.humanactivitymonitor
+			.addActivityRecognitionListener('RUNNING', function(activityInfo) {
+				var timestamp = new Date().getTime();
+				saveActivitySample(timestamp + "," + activityInfo.type);
+				console.log("activity type: " + activityInfo.type);
+			}, function(error) {
+				console.log(error.name + ': ' + error.message);
+			});
+	listenerIdStationary = tizen.humanactivitymonitor
+			.addActivityRecognitionListener(
+					'STATIONARY',
+					function(activityInfo) {
+						var timestamp = new Date().getTime();
+						saveActivitySample(timestamp + "," + activityInfo.type);
+						console.log("activity type: " + activityInfo.type);
+					}, function(error) {
+						console.log(error.name + ': ' + error.message);
+						console.log("activity type: " + activityInfo.type);
+					});
 }
+
 // sensing overall
 function startSensing() {
+	// Stress features
 	startHeartRateCollection();
-	startSleepMonitoring();
-	startGPS();
+
+	// Filter data
 	startHRMRawCollection();
 	startLinearAccelerationCollection();
+
+	// Context info
+	startGPS();
 	startAmbientLightCollection();
 	startActivityDetection();
 }
 
 // onstart
 window.onload = function() {
-	window.addEventListener('tizenhwkey', function(ev) {
-		if (ev.keyName === "back") {
-			var page = document.getElementsByClassName('ui-page-active')[0], pageid = page ? page.id : "";
-			if (pageid === "main") {
-				try {
-					if (appStatus) {
-						// window.webapis.motion.stop("HRM");
-						tizen.application.getCurrentApplication().hide();
-					} else {
-						tizen.power.release("CPU");
-						tizen.power.release("SCREEN");
+	window
+			.addEventListener(
+					'tizenhwkey',
+					function(ev) {
+						if (ev.keyName === "back") {
+							var page = document
+									.getElementsByClassName('ui-page-active')[0], pageid = page ? page.id
+									: "";
+							if (pageid === "main") {
+								try {
+									if (appStatus) {
+										// window.webapis.motion.stop("HRM");
+										tizen.application
+												.getCurrentApplication().hide();
+									} else {
+										tizen.power.release("CPU");
+										tizen.power.release("SCREEN");
 
-						tizen.application.getCurrentApplication().exit();
-					}
-				} catch (ignore) {
-				}
-			} else {
-				window.history.back();
-			}
-		}
-	});
+										tizen.application
+												.getCurrentApplication().exit();
+									}
+								} catch (ignore) {
+								}
+							} else {
+								window.history.back();
+							}
+						}
+					});
 
 	// bind views
 	statusText = document.getElementById("status_text");
@@ -175,26 +216,31 @@ window.onload = function() {
 	tizen.power.request("SCREEN", "SCREEN_NORMAL");
 
 	// acquire permissions and start data collection
-	tizen.ppm.requestPermission("http://tizen.org/privilege/mediastorage", function() {
-		tizen.ppm.requestPermission("http://tizen.org/privilege/healthinfo", function() {
-			tizen.filesystem.resolve("documents", function(dir) {
-				documentsDir = dir;
-				bindFilestreams();
-				startSensing();
+	tizen.ppm.requestPermission("http://tizen.org/privilege/mediastorage",
+			function() {
+				tizen.ppm.requestPermission(
+						"http://tizen.org/privilege/healthinfo", function() {
+							tizen.filesystem.resolve("documents",
+									function(dir) {
+										documentsDir = dir;
+										bindFilestreams();
+										// startSensing();
+									}, function(error) {
+										console.log('resolve error : '
+												+ error.message);
+									}, "rw");
+						}, function(error) {
+							console.log('resolve permission error : '
+									+ error.message);
+						});
 			}, function(error) {
-				console.log('resolve error : ' + error.message);
-			}, "rw");
-		}, function(error) {
-			console.log('resolve permission error : ' + error.message);
-		});
-	}, function(error) {
-		console.log('resolve permission error : ' + error.message);
-	});
+				console.log('resolve permission error : ' + error.message);
+			});
 
 	tizen.power.setScreenStateChangeListener(function(oldState, newState) {
 		if (newState !== "SCREEN_BRIGHT" || !tizen.power.isScreenOn()) {
 			tizen.power.turnScreenOn();
-			tizen.power.setScreenBrightness(1);
+			tizen.power.setScreenBrightness(0.1);
 		}
 	});
 };

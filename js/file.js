@@ -10,13 +10,7 @@ var ppgFilename = 'ppgLightIntensity.txt', ppgDataSource = 32, ppgCanWrite = fal
 var activityFilename = 'activity.txt', activityDataSource = 33, activityCanWrite = false, activitySending = false, activityFilestream = {
 	value : null
 };
-var sleepFilename = 'sleep.txt', sleepDataSource = 36, sleepCanWrite = false, sleepSending = false, sleepFilestream = {
-	value : null
-};
 var ambientLightFilename = 'ambientLight.txt', ambientLightDataSource = 38, ambientLightCanWrite = false, ambientLightSending = false, ambientLightFilestream = {
-	value : null
-};
-var heartRateFilename = 'heartRate.txt', heartRateDataSource = 34, heartRateCanWrite = false, heartRateSending = false, heartRateFilestream = {
 	value : null
 };
 var accelerometerFilename = 'accelerometer.txt', accelerometerDataSource = 37, accelerometerCanWrite = false, accelerometerSending = false, accelerometerFilestream = {
@@ -28,7 +22,7 @@ function bindLocation() {
 	// 1. location
 	tizen.filesystem.resolve('documents/' + locationFilename, function(file) {
 		// location file exists
-		file.openStream('w', function(fs) {
+		file.openStream('a', function(fs) {
 			locationFilestream.value = fs;
 			locationCanWrite = true;
 		}, function(e) {
@@ -42,7 +36,7 @@ function bindLocation() {
 			console.log('failed to create a new file : ' + locationFilename);
 			locationCanWrite = false;
 		} else {
-			file.openStream('w', function(fs) {
+			file.openStream('a', function(fs) {
 				locationFilestream.value = fs;
 				locationCanWrite = true;
 			}, function(e) {
@@ -56,7 +50,7 @@ function bindRrInterval() {
 	// 2. rrInterval
 	tizen.filesystem.resolve('documents/' + rrIntervalFilename, function(file) {
 		// rrInterval file exists
-		file.openStream('w', function(fs) {
+		file.openStream('a', function(fs) {
 			rrIntervalFilestream.value = fs;
 			rrIntervalCanWrite = true;
 		}, function(e) {
@@ -70,7 +64,7 @@ function bindRrInterval() {
 			console.log('failed to create a new file : ' + rrIntervalFilename);
 			rrIntervalCanWrite = false;
 		} else {
-			file.openStream('w', function(fs) {
+			file.openStream('a', function(fs) {
 				rrIntervalFilestream.value = fs;
 				rrIntervalCanWrite = true;
 			}, function(e) {
@@ -84,7 +78,7 @@ function bindPpg() {
 	// 3. ppg
 	tizen.filesystem.resolve('documents/' + ppgFilename, function(file) {
 		// ppg file exists
-		file.openStream('w', function(fs) {
+		file.openStream('a', function(fs) {
 			ppgFilestream.value = fs;
 			ppgCanWrite = true;
 		}, function(e) {
@@ -98,7 +92,7 @@ function bindPpg() {
 			console.log('failed to create a new file : ' + ppgFilename);
 			ppgCanWrite = false;
 		} else {
-			file.openStream('w', function(fs) {
+			file.openStream('a', function(fs) {
 				ppgFilestream.value = fs;
 				ppgCanWrite = true;
 			}, function(e) {
@@ -112,7 +106,7 @@ function bindActivity() {
 	// 4. activity
 	tizen.filesystem.resolve('documents/' + activityFilename, function(file) {
 		// activity file exists
-		file.openStream('w', function(fs) {
+		file.openStream('a', function(fs) {
 			activityFilestream.value = fs;
 			activityCanWrite = true;
 		}, function(e) {
@@ -126,7 +120,7 @@ function bindActivity() {
 			console.log('failed to create a new file : ' + activityFilename);
 			activityCanWrite = false;
 		} else {
-			file.openStream('w', function(fs) {
+			file.openStream('a', function(fs) {
 				activityFilestream.value = fs;
 				activityCanWrite = true;
 			}, function(e) {
@@ -136,39 +130,11 @@ function bindActivity() {
 		}
 	});
 }
-function bindSleep() {
-	// 5. sleep
-	tizen.filesystem.resolve('documents/' + sleepFilename, function(file) {
-		// sleep file exists
-		file.openStream('w', function(fs) {
-			sleepFilestream.value = fs;
-			sleepCanWrite = true;
-		}, function(e) {
-			console.log('failed to bind to an existing file : ' + sleepFilename + ', error : ' + e.message);
-			sleepCanWrite = false;
-		});
-	}, function(error) {
-		// sleep file is missing
-		var file = documentsDir.createFile(sleepFilename);
-		if (file === null) {
-			console.log('failed to create a new file : ' + sleepFilename);
-			sleepCanWrite = false;
-		} else {
-			file.openStream('w', function(fs) {
-				sleepFilestream.value = fs;
-				sleepCanWrite = true;
-			}, function(e) {
-				console.log('failed to bind to a new file : ' + sleepFilename + ', error : ' + e.message);
-				sleepCanWrite = false;
-			});
-		}
-	});
-}
 function bindAmbientLight() {
 	// 6. ambientLight
 	tizen.filesystem.resolve('documents/' + ambientLightFilename, function(file) {
 		// ambientLight file exists
-		file.openStream('w', function(fs) {
+		file.openStream('a', function(fs) {
 			ambientLightFilestream.value = fs;
 			ambientLightCanWrite = true;
 		}, function(e) {
@@ -182,7 +148,7 @@ function bindAmbientLight() {
 			console.log('failed to create a new file : ' + ambientLightFilename);
 			ambientLightCanWrite = false;
 		} else {
-			file.openStream('w', function(fs) {
+			file.openStream('a', function(fs) {
 				ambientLightFilestream.value = fs;
 				ambientLightCanWrite = true;
 			}, function(e) {
@@ -192,39 +158,11 @@ function bindAmbientLight() {
 		}
 	});
 }
-function bindHeartRate() {
-	// 7. heartRate
-	tizen.filesystem.resolve('documents/' + heartRateFilename, function(file) {
-		// heartRate file exists
-		file.openStream('w', function(fs) {
-			heartRateFilestream.value = fs;
-			heartRateCanWrite = true;
-		}, function(e) {
-			console.log('failed to bind to an existing file : ' + heartRateFilename + ', error : ' + e.message);
-			heartRateCanWrite = false;
-		});
-	}, function(error) {
-		// heartRate file is missing
-		var file = documentsDir.createFile(heartRateFilename);
-		if (file === null) {
-			console.log('failed to create a new file : ' + heartRateFilename);
-			heartRateCanWrite = false;
-		} else {
-			file.openStream('w', function(fs) {
-				heartRateFilestream.value = fs;
-				heartRateCanWrite = true;
-			}, function(e) {
-				console.log('failed to bind to a new file : ' + heartRateFilename + ', error : ' + e.message);
-				heartRateCanWrite = false;
-			});
-		}
-	});
-}
 function bindAccelerometer() {
 	// 8. accelerometer
 	tizen.filesystem.resolve('documents/' + accelerometerFilename, function(file) {
 		// accelerometer file exists
-		file.openStream('w', function(fs) {
+		file.openStream('a', function(fs) {
 			accelerometerFilestream.value = fs;
 			accelerometerCanWrite = true;
 		}, function(e) {
@@ -238,7 +176,7 @@ function bindAccelerometer() {
 			console.log('failed to create a new file : ' + accelerometerFilename);
 			accelerometerCanWrite = false;
 		} else {
-			file.openStream('w', function(fs) {
+			file.openStream('a', function(fs) {
 				accelerometerFilestream.value = fs;
 				accelerometerCanWrite = true;
 			}, function(e) {
@@ -250,13 +188,11 @@ function bindAccelerometer() {
 }
 // binding all filestreams
 function bindFilestreams() {
-	bindLocation();
 	bindRrInterval();
 	bindPpg();
+	bindLocation();
 	bindActivity();
-	bindSleep();
 	bindAmbientLight();
-	bindHeartRate();
 	bindAccelerometer();
 }
 
@@ -357,30 +293,6 @@ function submitActivity() {
 		onError();
 	});
 }
-function submitSleep() {
-	// 5. sleep
-	sleepCanWrite = false;
-	sleepFilestream.value.close();
-	documentsDir.moveTo('documents/' + sleepFilename, 'documents/old_' + sleepFilename, true, function() {
-		bindSleep();
-		tizen.filesystem.resolve('documents/old_' + sleepFilename, function(file) {
-			file.readAsText(function(str) {
-				sleepSending = true;
-				if (str.length === 0 || sendMessage(str)) {
-					documentsDir.deleteFile('documents/old_' + sleepFilename, function() {
-						console.log('old_' + sleepFilename + ' deleted');
-					}, function(e) {
-						console.log('failed to delete ' + sleepFilename + ', error : ' + e.message);
-					});
-				}
-				sleepSending = false;
-			}, null, 'UTF-8');
-		}, null);
-	}, function(error) {
-		console.log('failed to move the file ' + sleepFilename);
-		onError();
-	});
-}
 function submitAmbientLight() {
 	// 6. ambientLight
 	ambientLightCanWrite = false;
@@ -402,30 +314,6 @@ function submitAmbientLight() {
 		}, null);
 	}, function(error) {
 		console.log('failed to move the file ' + ambientLightFilename);
-		onError();
-	});
-}
-function submitHeartRate() {
-	// 7. heartRate
-	heartRateCanWrite = false;
-	heartRateFilestream.value.close();
-	documentsDir.moveTo('documents/' + heartRateFilename, 'documents/old_' + heartRateFilename, true, function() {
-		bindHeartRate();
-		tizen.filesystem.resolve('documents/old_' + heartRateFilename, function(file) {
-			file.readAsText(function(str) {
-				heartRateSending = true;
-				if (str.length === 0 || sendMessage(str)) {
-					documentsDir.deleteFile('documents/old_' + heartRateFilename, function() {
-						console.log('old_' + heartRateFilename + ' deleted');
-					}, function(e) {
-						console.log('failed to delete ' + heartRateFilename + ', error : ' + e.message);
-					});
-				}
-				heartRateSending = false;
-			}, null, 'UTF-8');
-		}, null);
-	}, function(error) {
-		console.log('failed to move the file ' + heartRateFilename);
 		onError();
 	});
 }
@@ -467,14 +355,8 @@ function submitFilesToAndroidAgent() {
 	if (!activitySending) {
 		submitActivity();
 	}
-	if (!sleepSending) {
-		submitSleep();
-	}
 	if (!ambientLightSending) {
 		submitAmbientLight();
-	}
-	if (!heartRateSending) {
-		submitHeartRate();
 	}
 	if (!accelerometerSending) {
 		submitAccelerometer();
@@ -502,19 +384,9 @@ function saveActivitySample(sample) {
 		activityFilestream.value.write(activityDataSource + ',' + sample + '\n');
 	}
 }
-function saveSleepSample(sample) {
-	if (sleepCanWrite) {
-		sleepFilestream.value.write(sleepDataSource + ',' + sample + '\n');
-	}
-}
 function saveAmbientLightSample(sample) {
 	if (ambientLightCanWrite) {
 		ambientLightFilestream.value.write(ambientLightDataSource + ',' + sample + '\n');
-	}
-}
-function saveHeartRateSample(sample) {
-	if (heartRateCanWrite) {
-		heartRateFilestream.value.write(heartRateDataSource + ',' + sample + '\n');
 	}
 }
 function saveAccelerometerSample(sample) {
