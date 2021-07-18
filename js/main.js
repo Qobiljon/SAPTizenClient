@@ -26,14 +26,6 @@ function startHeartRateCollection() {
 	});
 	console.log('HRM started');
 }
-function startSleepMonitoring() {
-	var timestamp = new Date().getTime();
-	tizen.humanactivitymonitor.start('SLEEP_MONITOR', function(sleepInfo) {
-		saveSleepSample(timestamp + "," + sleepInfo.status);
-		console.log("sleep status: " + sleepInfo.status)
-	});
-	console.log('sleep monitoring started');
-}
 function startGPS() {
 	tizen.ppm.requestPermission("http://tizen.org/privilege/location", function() {
 		var timestamp = new Date().getTime();
@@ -130,7 +122,6 @@ function startActivityDetection() {
 // sensing overall
 function startSensing() {
 	startHeartRateCollection();
-	startSleepMonitoring();
 	startGPS();
 	startHRMRawCollection();
 	startLinearAccelerationCollection();

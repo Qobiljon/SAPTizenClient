@@ -5,21 +5,38 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 		<meta name="description" content="Tizen Wearable Web Basic Template" />
 		
-		<link rel="stylesheet" type="text/css" href="css/style.css" />
+		<link rel="stylesheet"  href="css/tau.min.css">
+		<link rel="stylesheet" media="all and (-tizen-geometric-shape: circle)" href="css/tau.circle.min.css">
+		<!-- load theme file for your application -->
+		<link rel="stylesheet"  href="css/style.css">
+		
 		<script type="text/javascript" src="js/main.js"></script>
 		<script type="text/javascript" src="js/sap.js"></script>
 		<script type="text/javascript" src="js/file.js"></script>
-		<script type="text/javascript" src="js/lowBatteryCheck.js"></script>
+		<script type="text/javascript" src="lib/lowBatteryCheck.js"></script>
 		
-		<title>Stress sensing</title>
+		<title>SOSW</title>
 	</head>
 	
 	<body>
-		<div id="main" class="contents">
-			<span id="status_text">BT : DUMMY</span>
-			<a href="#" id="connect_button" class="button" onclick="connect();">Connect</a>
-			<!-- a href="#" class="button" onclick="aboutClick();">About</a>
-			<a href="#" class="button" onclick="exitApp();">Exit</a-->
+		<div class="ui-page ui-page-active" id="main">
+			<header class="ui-header">
+				<h2 class="ui-title" id="status_text">BT : DUMMY</h2>
+			</header>
+			<div class="ui-content">
+				<ul class="ui-listview">
+					<li><a href="#" onclick="connect();" id="connect_button">CONNECT</a></li>
+					<li><a href="#" onclick="aboutClick();">ABOUT SOSW</a></li>
+					<li><a href="#" onclick="exitApp();">EXIT APP</a></li>
+				</ul>
+			</div>
+			<div id="toast" class="ui-popup ui-popup-toast">
+				<div id="toast-content" class="ui-popup-content">
+				</div>
+			</div>
 		</div>
 	</body>
+	
+	<script type="text/javascript" src="lib/tau.min.js"></script>
+	<script type="text/javascript" src="lib/circle-helper.js"></script>
 </html>

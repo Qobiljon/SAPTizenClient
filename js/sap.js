@@ -1,5 +1,4 @@
-const
-ProviderAppName = "SAPAndroidClient", CHANNELID = 110;
+const ProviderAppName = "SAPAndroidClient", CHANNELID = 104;
 var SASocket = null;
 var SAAgent = null;
 
@@ -16,7 +15,9 @@ var agentCallback = {
 			setConnectionStatusHTML(false);
 		});
 	},
-	onerror : onerror
+	onerror : function(error) {
+		console.log('error : ' + error);
+	}
 };
 
 var peerAgentFindCallback = {
@@ -28,27 +29,14 @@ var peerAgentFindCallback = {
 			} else {
 				alert("Different app : " + peerAgent.appName);
 			}
-		} catch (err) {
-			console.log("Failed to request service connection [" + err.name + "] msg[" + err.message + "]");
+		} catch (error) {
+			console.log("Failed to request service connection [" + error.name + "] msg[" + error.message + "]");
 		}
 	},
-	onerror : onerror
-};
-
-function onsuccess(agents) {
-	try {
-		if (agents.length > 0) {
-			SAAgent = agents[0];
-
-			SAAgent.setPeerAgentFindListener(peerAgentFindCallback);
-			SAAgent.findPeerAgents();
-		} else {
-			alert("SAPAndroidClient not found!");
-		}
-	} catch (err) {
-		console.log("Failed to find peers [" + err.name + "] msg[" + err.message + "]");
+	onerror : function(error) {
+		console.log('error : ' + error);
 	}
-}
+};
 
 function connect() {
 	if (SASocket) {
@@ -62,11 +50,24 @@ function connect() {
 		return false;
 	}
 	try {
-		webapis.sa.requestSAAgent(onsuccess, function(err) {
-			console.log("Failed to request SAAgent [" + err.name + "] msg[" + err.message + "]");
+		webapis.sa.requestSAAgent(function(agents) {
+			try {
+				if (agents.length > 0) {
+					SAAgent = agents[0];
+
+					SAAgent.setPeerAgentFindListener(peerAgentFindCallback);
+					SAAgent.findPeerAgents();
+				} else {
+					alert("SAPAndroidClient not found!");
+				}
+			} catch (error) {
+				console.log("Failed to find peers [" + error.name + "] msg[" + error.message + "]");
+			}
+		}, function(error) {
+			console.log("Failed to request SAAgent [" + error.name + "] msg[" + error.message + "]");
 		});
-	} catch (err) {
-		console.log("Failed to request SAAgent [" + err.name + "] msg[" + err.message + "]");
+	} catch (error) {
+		console.log("Failed to request SAAgent [" + error.name + "] msg[" + error.message + "]");
 	}
 }
 
@@ -78,8 +79,8 @@ function disconnect() {
 
 			console.log("disconnected from SAPAndroidClient");
 		}
-	} catch (err) {
-		console.log("Failed to disconnect [" + err.name + "] msg[" + err.message + "]");
+	} catch (error) {
+		console.log("Failed to disconnect [" + error.name + "] msg[" + error.message + "]");
 	}
 }
 
@@ -91,14 +92,15 @@ function sendMessage(data) {
 		}
 		SASocket.sendData(CHANNELID, data);
 		return true;
-	} catch (err) {
-		console.log("Failed to send data [" + err.name + "] msg[" + err.message + "]");
+	} catch (error) {
+		console.log("Failed to send data [" + error.name + "] msg["
+				+ error.message + "]");
 		return false;
 	}
 }
 
 function onreceive(channelId, data) {
-	if (data.length == 1) {
+	if (data.length === 1) {
 		submitFilesToAndroidAgent();
 	}
 }
