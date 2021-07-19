@@ -84,7 +84,7 @@ function disconnect() {
 	}
 }
 
-function sendMessage(data) {
+function sendSAPMessage(data) {
 	try {
 		if (SASocket === null) {
 			connect();
@@ -101,6 +101,6 @@ function sendMessage(data) {
 
 function onreceive(channelId, data) {
 	if (data.length === 1) {
-		submitFilesToAndroidAgent();
+		uploadData();
 	}
 }
