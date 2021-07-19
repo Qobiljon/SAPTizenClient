@@ -1,5 +1,5 @@
 const
-ProviderAppName = "SAPAndroidClient", CHANNELID = 110;
+ProviderAppName = "SAPAndroidClient", CHANNELID = 104;
 var SASocket = null;
 var SAAgent = null;
 
@@ -98,7 +98,7 @@ function sendMessage(data) {
 }
 
 function onreceive(channelId, data) {
-	if (data.length == 1) {
+	if (data == "upload data") {
 		submitFilesToAndroidAgent();
 	}
 }

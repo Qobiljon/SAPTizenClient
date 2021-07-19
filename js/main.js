@@ -130,7 +130,6 @@ function startActivityDetection() {
 // sensing overall
 function startSensing() {
 	startHeartRateCollection();
-	startSleepMonitoring();
 	startGPS();
 	startHRMRawCollection();
 	startLinearAccelerationCollection();

@@ -1,25 +1,22 @@
 var locationFilename = 'location.txt', locationDataSource = 31, locationCanWrite = false, locationSending = false, locationFilestream = {
 	value : null
 };
-var rrIntervalFilename = 'rrInterval.txt', rrIntervalDataSource = 35, rrIntervalCanWrite = false, rrIntervalSending = false, rrIntervalFilestream = {
+var rrIntervalFilename = 'rrInterval.txt', rrIntervalDataSource = 41, rrIntervalCanWrite = false, rrIntervalSending = false, rrIntervalFilestream = {
 	value : null
 };
-var ppgFilename = 'ppgLightIntensity.txt', ppgDataSource = 32, ppgCanWrite = false, ppgSending = false, ppgFilestream = {
+var ppgFilename = 'ppgLightIntensity.txt', ppgDataSource = 43, ppgCanWrite = false, ppgSending = false, ppgFilestream = {
 	value : null
 };
-var activityFilename = 'activity.txt', activityDataSource = 33, activityCanWrite = false, activitySending = false, activityFilestream = {
+var activityFilename = 'activity.txt', activityDataSource = 45, activityCanWrite = false, activitySending = false, activityFilestream = {
 	value : null
 };
-var sleepFilename = 'sleep.txt', sleepDataSource = 36, sleepCanWrite = false, sleepSending = false, sleepFilestream = {
+var ambientLightFilename = 'ambientLight.txt', ambientLightDataSource = 44, ambientLightCanWrite = false, ambientLightSending = false, ambientLightFilestream = {
 	value : null
 };
-var ambientLightFilename = 'ambientLight.txt', ambientLightDataSource = 38, ambientLightCanWrite = false, ambientLightSending = false, ambientLightFilestream = {
+var heartRateFilename = 'heartRate.txt', heartRateDataSource = 46, heartRateCanWrite = false, heartRateSending = false, heartRateFilestream = {
 	value : null
 };
-var heartRateFilename = 'heartRate.txt', heartRateDataSource = 34, heartRateCanWrite = false, heartRateSending = false, heartRateFilestream = {
-	value : null
-};
-var accelerometerFilename = 'accelerometer.txt', accelerometerDataSource = 37, accelerometerCanWrite = false, accelerometerSending = false, accelerometerFilestream = {
+var accelerometerFilename = 'accelerometer.txt', accelerometerDataSource = 42, accelerometerCanWrite = false, accelerometerSending = false, accelerometerFilestream = {
 	value : null
 };
 
@@ -136,34 +133,6 @@ function bindActivity() {
 		}
 	});
 }
-function bindSleep() {
-	// 5. sleep
-	tizen.filesystem.resolve('documents/' + sleepFilename, function(file) {
-		// sleep file exists
-		file.openStream('w', function(fs) {
-			sleepFilestream.value = fs;
-			sleepCanWrite = true;
-		}, function(e) {
-			console.log('failed to bind to an existing file : ' + sleepFilename + ', error : ' + e.message);
-			sleepCanWrite = false;
-		});
-	}, function(error) {
-		// sleep file is missing
-		var file = documentsDir.createFile(sleepFilename);
-		if (file === null) {
-			console.log('failed to create a new file : ' + sleepFilename);
-			sleepCanWrite = false;
-		} else {
-			file.openStream('w', function(fs) {
-				sleepFilestream.value = fs;
-				sleepCanWrite = true;
-			}, function(e) {
-				console.log('failed to bind to a new file : ' + sleepFilename + ', error : ' + e.message);
-				sleepCanWrite = false;
-			});
-		}
-	});
-}
 function bindAmbientLight() {
 	// 6. ambientLight
 	tizen.filesystem.resolve('documents/' + ambientLightFilename, function(file) {
@@ -254,7 +223,6 @@ function bindFilestreams() {
 	bindRrInterval();
 	bindPpg();
 	bindActivity();
-	bindSleep();
 	bindAmbientLight();
 	bindHeartRate();
 	bindAccelerometer();
@@ -270,7 +238,7 @@ function submitLocations() {
 		tizen.filesystem.resolve('documents/old_' + locationFilename, function(file) {
 			file.readAsText(function(str) {
 				locationSending = true;
-				if (str.length === 0 || sendMessage(str)) {
+				if (str.length === 0 || sendMessage("abc\n" + str)) {
 					documentsDir.deleteFile('documents/old_' + locationFilename, function() {
 						console.log('old_' + locationFilename + ' deleted');
 					}, function(e) {
@@ -294,7 +262,7 @@ function submitRrInterval() {
 		tizen.filesystem.resolve('documents/old_' + rrIntervalFilename, function(file) {
 			file.readAsText(function(str) {
 				rrIntervalSending = true;
-				if (str.length === 0 || sendMessage(str)) {
+				if (str.length === 0 || sendMessage("abc\n" + str)) {
 					documentsDir.deleteFile('documents/old_' + rrIntervalFilename, function() {
 						console.log('old_' + rrIntervalFilename + ' deleted');
 					}, function(e) {
@@ -318,7 +286,7 @@ function submitPPG() {
 		tizen.filesystem.resolve('documents/old_' + ppgFilename, function(file) {
 			file.readAsText(function(str) {
 				ppgSending = true;
-				if (str.length === 0 || sendMessage(str)) {
+				if (str.length === 0 || sendMessage("abc\n" + str)) {
 					documentsDir.deleteFile('documents/old_' + ppgFilename, function() {
 						console.log('old_' + ppgFilename + ' deleted');
 					}, function(e) {
@@ -342,7 +310,7 @@ function submitActivity() {
 		tizen.filesystem.resolve('documents/old_' + activityFilename, function(file) {
 			file.readAsText(function(str) {
 				activitySending = true;
-				if (str.length === 0 || sendMessage(str)) {
+				if (str.length === 0 || sendMessage("abc\n" + str)) {
 					documentsDir.deleteFile('documents/old_' + activityFilename, function() {
 						console.log('old_' + activityFilename + ' deleted');
 					}, function(e) {
@@ -357,30 +325,6 @@ function submitActivity() {
 		onError();
 	});
 }
-function submitSleep() {
-	// 5. sleep
-	sleepCanWrite = false;
-	sleepFilestream.value.close();
-	documentsDir.moveTo('documents/' + sleepFilename, 'documents/old_' + sleepFilename, true, function() {
-		bindSleep();
-		tizen.filesystem.resolve('documents/old_' + sleepFilename, function(file) {
-			file.readAsText(function(str) {
-				sleepSending = true;
-				if (str.length === 0 || sendMessage(str)) {
-					documentsDir.deleteFile('documents/old_' + sleepFilename, function() {
-						console.log('old_' + sleepFilename + ' deleted');
-					}, function(e) {
-						console.log('failed to delete ' + sleepFilename + ', error : ' + e.message);
-					});
-				}
-				sleepSending = false;
-			}, null, 'UTF-8');
-		}, null);
-	}, function(error) {
-		console.log('failed to move the file ' + sleepFilename);
-		onError();
-	});
-}
 function submitAmbientLight() {
 	// 6. ambientLight
 	ambientLightCanWrite = false;
@@ -390,7 +334,7 @@ function submitAmbientLight() {
 		tizen.filesystem.resolve('documents/old_' + ambientLightFilename, function(file) {
 			file.readAsText(function(str) {
 				ambientLightSending = true;
-				if (str.length === 0 || sendMessage(str)) {
+				if (str.length === 0 || sendMessage("abc\n" + str)) {
 					documentsDir.deleteFile('documents/old_' + ambientLightFilename, function() {
 						console.log('old_' + ambientLightFilename + ' deleted');
 					}, function(e) {
@@ -414,7 +358,7 @@ function submitHeartRate() {
 		tizen.filesystem.resolve('documents/old_' + heartRateFilename, function(file) {
 			file.readAsText(function(str) {
 				heartRateSending = true;
-				if (str.length === 0 || sendMessage(str)) {
+				if (str.length === 0 || sendMessage("abc\n" + str)) {
 					documentsDir.deleteFile('documents/old_' + heartRateFilename, function() {
 						console.log('old_' + heartRateFilename + ' deleted');
 					}, function(e) {
@@ -438,7 +382,7 @@ function submitAccelerometer() {
 		tizen.filesystem.resolve('documents/old_' + accelerometerFilename, function(file) {
 			file.readAsText(function(str) {
 				accelerometerSending = true;
-				if (str.length === 0 || sendMessage(str)) {
+				if (str.length === 0 || sendMessage("abc\n" + str)) {
 					documentsDir.deleteFile('documents/old_' + accelerometerFilename, function() {
 						console.log('old_' + accelerometerFilename + ' deleted');
 					}, function(e) {
@@ -466,9 +410,6 @@ function submitFilesToAndroidAgent() {
 	}
 	if (!activitySending) {
 		submitActivity();
-	}
-	if (!sleepSending) {
-		submitSleep();
 	}
 	if (!ambientLightSending) {
 		submitAmbientLight();
@@ -500,11 +441,6 @@ function savePPGSample(sample) {
 function saveActivitySample(sample) {
 	if (activityCanWrite) {
 		activityFilestream.value.write(activityDataSource + ',' + sample + '\n');
-	}
-}
-function saveSleepSample(sample) {
-	if (sleepCanWrite) {
-		sleepFilestream.value.write(sleepDataSource + ',' + sample + '\n');
 	}
 }
 function saveAmbientLightSample(sample) {
