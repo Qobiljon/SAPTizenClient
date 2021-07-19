@@ -19,9 +19,9 @@ function startHeartRateCollection() {
 			tizen.application.launch("WGvCVP8H7a.SAPTizenClient");
 		}
 	}, function(error) {
-		console.log('error : ' + error);
+		// console.log('error : ' + error);
 	});
-	console.log('HRM started');
+	// console.log('HRM started');
 }
 function startHRMRawCollection() {
 	ppgSensor = tizen.sensorservice.getDefaultSensor("HRM_RAW");
@@ -31,15 +31,15 @@ function startHRMRawCollection() {
 			savePPGSample(timestamp + "," + ppgData.lightIntensity);
 		};
 		var onerror = function() {
-			console.log("error occurred:" + error);
+			// console.log("error occurred:" + error);
 		};
 
 		ppgSensor.getHRMRawSensorData(listener, onerror);
 		ppgSensor.setChangeListener(listener, 10);
 	}, function(error) {
-		console.log('error : ' + error.message);
+		// console.log('error : ' + error.message);
 	});
-	console.log('HRM Raw collection started');
+	// console.log('HRM Raw collection started');
 }
 function startLinearAccelerationCollection() {
 	linearAccelerationSensor = tizen.sensorservice
@@ -51,13 +51,13 @@ function startLinearAccelerationCollection() {
 					+ accData.y + "," + accData.z);
 		};
 		var onerror = function(error) {
-			console.log('error : ' + error);
+			// console.log('error : ' + error);
 		};
 		linearAccelerationSensor.getLinearAccelerationSensorData(listener,
 				onerror);
 		linearAccelerationSensor.setChangeListener(listener, 50);
 	});
-	console.log('Linear acc collection started');
+	// console.log('Linear acc collection started');
 }
 function startAmbientLightCollection() {
 	lightSensor = tizen.sensorservice.getDefaultSensor("LIGHT");
@@ -67,21 +67,21 @@ function startAmbientLightCollection() {
 			saveAmbientLightSample(timestamp + "," + lightData.lightLevel);
 		};
 		var onerror = function(error) {
-			console.log('error : ' + error);
+			// console.log('error : ' + error);
 		};
 		lightSensor.getLightSensorData(listener, onerror);
 		lightSensor.setChangeListener(listener, 1000);
 	});
-	console.log('Ambient light sensor start');
+	// console.log('Ambient light sensor start');
 }
 function startActivityDetection() {
 	var listener = function(activityInfo) {
-		console.log('Activity');
+		// console.log('Activity');
 		var timestamp = new Date().getTime();
 		saveActivitySample(timestamp + "," + activityInfo.type);
 	};
 	var onerror = function(error) {
-		console.log('error : ' + error.message);
+		// console.log('error : ' + error.message);
 	};
 	listenerIdWalking = tizen.humanactivitymonitor
 			.addActivityRecognitionListener('WALKING', listener, onerror);
@@ -148,17 +148,17 @@ window.onload = function() {
 										documentsDir = dir;
 										bindFilestreams();
 										startSensing();
-										console.log('sensing started');
+										// console.log('sensing started');
 									}, function(error) {
-										console.log('resolve error : '
+										// console.log('resolve error : '
 												+ error.message);
 									}, "rw");
 						}, function(error) {
-							console.log('resolve permission error : '
+							// console.log('resolve permission error : '
 									+ error.message);
 						});
 			}, function(error) {
-				console.log('resolve permission error : ' + error.message);
+				// console.log('resolve permission error : ' + error.message);
 			});
 
 	tizen.power.setScreenStateChangeListener(function(oldState, newState) {
@@ -189,14 +189,14 @@ function exitApp() {
 }
 function checkDataSize() {
 	documentsDir.listFiles(function(files) {
-		var totalSize = 0;
+		var count = 0;
 		for (var i = 0; i < files.length; i++) {
-			totalSize += files[i].fileSize;
+			if (/^\d+.+\.sosw$/.test(files[i].name))
+				count += 1;
 		}
-		alert("Total size of locally stored files is "
-				+ Math.round(totalSize / 1024 / 1024 * 100) / 100 + " MB");
+		alert(count + ' files need to be transfered!');
 	}, function(error) {
-		console.log('error : ' + error);
+		// console.log('error : ' + error);
 	});
 }
 function uploadData() {
@@ -205,23 +205,22 @@ function uploadData() {
 		documentsDir.listFiles(function(files) {
 			for (var i = 0; i < files.length; i++) {
 				if (/^\d+.+\.sosw$/.test(files[i].name)) {
-					console.log("sending " + files[i].name);
-					var file = tizen.filesystem.openFile("documents/"
-							+ files[i].name, "rw");
+					// console.log("sending " + files[i].name);
+					var file = tizen.filesystem.openFile("documents/" + files[i].name, "rw");
 					var data = file.readString();
 					file.close();
 					if (sendSAPMessage(files[i].name + '\n' + data)) {
-						console.log('sent');
+						// console.log('sent');
 					} else {
-						console.log('failed to send');
+						// console.log('failed to send');
 					}
 				} else {
-					console.log("not matches " + files[i].name);
+					// console.log("not matches " + files[i].name);
 				}
 			}
 			uploading = false;
 		}, function(error) {
-			console.log('error : ' + error);
+			// console.log('error : ' + error);
 			uploading = false;
 		});
 	}

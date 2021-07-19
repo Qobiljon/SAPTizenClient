@@ -6,17 +6,17 @@ var agentCallback = {
 	onconnect : function(socket) {
 		SASocket = socket;
 		SASocket.setDataReceiveListener(onreceive);
-		console.log("connected to the SAPAndroidClient");
+		// console.log("connected to the SAPAndroidClient");
 		setConnectionStatusHTML(true);
 
 		SASocket.setSocketStatusListener(function(reason) {
-			console.log("Connection with SAPAndroidClient lost. Reason : [" + reason + "]");
+			// console.log("Connection with SAPAndroidClient lost. Reason : [" + reason + "]");
 			disconnect();
 			setConnectionStatusHTML(false);
 		});
 	},
 	onerror : function(error) {
-		console.log('error : ' + error);
+		// console.log('error : ' + error);
 	}
 };
 
@@ -30,11 +30,11 @@ var peerAgentFindCallback = {
 				alert("Different app : " + peerAgent.appName);
 			}
 		} catch (error) {
-			console.log("Failed to request service connection [" + error.name + "] msg[" + error.message + "]");
+			// console.log("Failed to request service connection [" + error.name + "] msg[" + error.message + "]");
 		}
 	},
 	onerror : function(error) {
-		console.log('error : ' + error);
+		// console.log('error : ' + error);
 	}
 };
 
@@ -43,7 +43,7 @@ function connect() {
 		alert('Already connected!');
 
 		SASocket.setSocketStatusListener(function(reason) {
-			console.log("Service connection lost. Reason : [" + reason + "]");
+			// console.log("Service connection lost. Reason : [" + reason + "]");
 			disconnect();
 		});
 
@@ -61,13 +61,13 @@ function connect() {
 					alert("SAPAndroidClient not found!");
 				}
 			} catch (error) {
-				console.log("Failed to find peers [" + error.name + "] msg[" + error.message + "]");
+				// console.log("Failed to find peers [" + error.name + "] msg[" + error.message + "]");
 			}
 		}, function(error) {
-			console.log("Failed to request SAAgent [" + error.name + "] msg[" + error.message + "]");
+			// console.log("Failed to request SAAgent [" + error.name + "] msg[" + error.message + "]");
 		});
 	} catch (error) {
-		console.log("Failed to request SAAgent [" + error.name + "] msg[" + error.message + "]");
+		// console.log("Failed to request SAAgent [" + error.name + "] msg[" + error.message + "]");
 	}
 }
 
@@ -77,10 +77,10 @@ function disconnect() {
 			SASocket.close();
 			SASocket = null;
 
-			console.log("disconnected from SAPAndroidClient");
+			// console.log("disconnected from SAPAndroidClient");
 		}
 	} catch (error) {
-		console.log("Failed to disconnect [" + error.name + "] msg[" + error.message + "]");
+		// console.log("Failed to disconnect [" + error.name + "] msg[" + error.message + "]");
 	}
 }
 
@@ -93,7 +93,7 @@ function sendSAPMessage(data) {
 		SASocket.sendData(CHANNELID, data);
 		return true;
 	} catch (error) {
-		console.log("Failed to send data [" + error.name + "] msg["
+		// console.log("Failed to send data [" + error.name + "] msg["
 				+ error.message + "]");
 		return false;
 	}
@@ -101,10 +101,10 @@ function sendSAPMessage(data) {
 
 function onreceive(channelId, data) {
 	if (data === "upload data") {
-		console.log('file delete request received');
+		// console.log('file delete request received');
 		uploadData();
 	} else if (data.startsWith('delete ')) {
-		console.log('file delete request received');
+		// console.log('file delete request received');
 		tizen.filesystem.deleteFile("documents/" + data.split(' ')[1]);
 	}
 }
