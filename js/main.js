@@ -47,14 +47,12 @@ function startLinearAccelerationCollection() {
 	linearAccelerationSensor.start(function() {
 		var listener = function(accData) {
 			var timestamp = new Date().getTime();
-			saveAccelerometerSample(timestamp + "," + accData.x + ","
-					+ accData.y + "," + accData.z);
+			saveAccelerometerSample(timestamp + "," + accData.x + "," + accData.y + "," + accData.z);
 		};
 		var onerror = function(error) {
 			// console.log('error : ' + error);
 		};
-		linearAccelerationSensor.getLinearAccelerationSensorData(listener,
-				onerror);
+		linearAccelerationSensor.getLinearAccelerationSensorData(listener, onerror);
 		linearAccelerationSensor.setChangeListener(listener, 50);
 	});
 	// console.log('Linear acc collection started');
@@ -83,14 +81,10 @@ function startActivityDetection() {
 	var onerror = function(error) {
 		// console.log('error : ' + error.message);
 	};
-	listenerIdWalking = tizen.humanactivitymonitor
-			.addActivityRecognitionListener('WALKING', listener, onerror);
-	listenerIdWalking = tizen.humanactivitymonitor
-			.addActivityRecognitionListener('RUNNING', listener, onerror);
-	listenerIdWalking = tizen.humanactivitymonitor
-			.addActivityRecognitionListener('STATIONARY', listener, onerror);
-	listenerIdWalking = tizen.humanactivitymonitor
-			.addActivityRecognitionListener('IN_VEHICLE', listener, onerror);
+	listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('WALKING', listener, onerror);
+	listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('RUNNING', listener, onerror);
+	listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('STATIONARY', listener, onerror);
+	listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('IN_VEHICLE', listener, onerror);
 }
 // sensing overall
 function startSensing() {
@@ -150,12 +144,10 @@ window.onload = function() {
 										startSensing();
 										// console.log('sensing started');
 									}, function(error) {
-										// console.log('resolve error : '
-												+ error.message);
+										// console.log('resolve error : ' + error.message);
 									}, "rw");
 						}, function(error) {
-							// console.log('resolve permission error : '
-									+ error.message);
+							// console.log('resolve permission error : ' + error.message);
 						});
 			}, function(error) {
 				// console.log('resolve permission error : ' + error.message);

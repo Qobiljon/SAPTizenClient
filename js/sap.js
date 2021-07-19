@@ -93,8 +93,7 @@ function sendSAPMessage(data) {
 		SASocket.sendData(CHANNELID, data);
 		return true;
 	} catch (error) {
-		// console.log("Failed to send data [" + error.name + "] msg["
-				+ error.message + "]");
+		// console.log("Failed to send data [" + error.name + "] msg[" + error.message + "]");
 		return false;
 	}
 }

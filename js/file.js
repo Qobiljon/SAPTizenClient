@@ -10,8 +10,7 @@ var accelerometerFilename = 'accelerometer.sosw', accelerometerDataSource = 42, 
 
 // binding each filestream separately
 function bindRrInterval() {
-	var file = tizen.filesystem
-			.openFile("documents/" + rrIntervalFilename, "a");
+	var file = tizen.filesystem.openFile("documents/" + rrIntervalFilename, "a");
 	if (file == null) {
 		documentsDir.createFile(rrIntervalFilename);
 	} else {
@@ -43,8 +42,7 @@ function bindActivity() {
 	}
 }
 function bindAmbientLight() {
-	var file = tizen.filesystem.openFile("documents/" + ambientLightFilename,
-			"a");
+	var file = tizen.filesystem.openFile("documents/" + ambientLightFilename, "a");
 	if (file == null) {
 		documentsDir.createFile(ambientLightFilename);
 	} else {
@@ -52,8 +50,7 @@ function bindAmbientLight() {
 	}
 }
 function bindAccelerometer() {
-	var file = tizen.filesystem.openFile("documents/" + accelerometerFilename,
-			"a");
+	var file = tizen.filesystem.openFile("documents/" + accelerometerFilename, "a");
 	if (file == null) {
 		documentsDir.createFile(accelerometerFilename);
 	} else {
@@ -143,7 +140,7 @@ function saveAmbientLightSample(sample) {
 	}
 }
 function saveHeartRateSample(sample) {
-	var file = tizen.filesystem.openFile("documents/" + heartRateFilename, "w");
+	var file = tizen.filesystem.openFile("documents/" + heartRateFilename, "a");
 	file.writeString(heartRateDataSource + ',' + sample + '\n');
 	file.close();
 
@@ -154,7 +151,7 @@ function saveHeartRateSample(sample) {
 	}
 }
 function saveAccelerometerSample(sample) {
-	var file = tizen.filesystem.openFile("documents/" + accelerometerFilename, "w");
+	var file = tizen.filesystem.openFile("documents/" + accelerometerFilename, "a");
 	file.writeString(accelerometerDataSource + ',' + sample + '\n');
 	file.close();
 
