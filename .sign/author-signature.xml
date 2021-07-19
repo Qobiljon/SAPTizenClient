@@ -39,13 +39,13 @@ ru6aJ26tjw==</DigestValue>
 </Reference>
 <Reference URI="js%2Fmain.js">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
-<DigestValue>muTqUlC1NEvaAux4x6J8LhuBaj3PR56uQ56lkKyDq9xEY3BzOWIy/ntYvFNNjn5WMHCXxKae/4He
-WxxZHWxtFQ==</DigestValue>
+<DigestValue>x7U2yIxL9FiJO3ZIJX4CsrjxvUeExjvU0D4NG9YxKB15c/znVG300d7+xLBdSHYQII0aBH5VNyYR
+AEhYof8fAA==</DigestValue>
 </Reference>
 <Reference URI="js%2Fsap.js">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
-<DigestValue>JyJL5PJBQIAYMjz0TW6WymI6VT3+vrfhk04XZXkGLsZ6GqJAjTXZ30Hd6aJKKAsgYcpm9gm3wCuC
-ixDxeH1IWg==</DigestValue>
+<DigestValue>6Iaul1Ei/BmpB/axMItdiG1qjK05Cy61DlmQ+l8Bgdxjxo7cFXjm+R0veJNEcqJfLoaEJmYatD1f
+xarKNyCY3Q==</DigestValue>
 </Reference>
 <Reference URI="lib%2Fcircle-helper.js">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
@@ -82,11 +82,11 @@ QY10fG1EWQ==</DigestValue>
 </Reference>
 </SignedInfo>
 <SignatureValue>
-YMNIj1khw5aT1kFulRauPrAmKdC08WVCpat7zj8G9fusLIzpsyxIVIQ3MTyT7k3dxpuZc4cGtkkr
-YHxND9K+zOrWPefnGTzeeg70IA44jUME+lN2I3AAhxBEK8w4RggZjpAW5YDTwFjN7x65PJ5F6yVW
-G946s9SNB7jN1IwyMsZddFAWVe9cI1j7iitO59Xett4gCi//uRVIiLv0VTYlw/Yb6ol2jkjhqf5f
-VAwP7M0Lp40qOwYQdBZqvLaF5eVmVrj2SZ7le+CeXbKCiAaNwwKi8TA6iB58BnBzMOudXFgMKn4J
-oXNLof17Cjh8K9UXc7HkO2u4HOfXYnv7e8SDsw==
+KpW6tU7falc9fmU1vyZedhLKfpWGbo5EBsjF/+oku14864ITt7I+KY6sfkqc5JPOolWvqB8upHKt
+ShqwoaTbvgoKcbNaIlZ7iVNrpJZEhKsfRdd8rZkghZKUiU8P01LmD9pvH+gqqkTBvIq+Cr2wZjit
+dP/DPFqUgiTG7B/muUYB6WsNN9TPozVqqj8aFlJNvBeEHL9hDruiJEPefzyiDq0drKoc5iDCeMXs
+pZ7/gYNiFvnTLZkazoWYRLANfAkeAi7BocaaXhYq3eRgHQQFmjwOjs9toZZFU+aPeJATJT+bZ9DN
+ym4BQMMCMuXsFVQ9/wYf9X86SOS2O7JCH3qljw==
 </SignatureValue>
 <KeyInfo>
 <X509Data>

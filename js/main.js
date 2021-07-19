@@ -15,6 +15,9 @@ function startHeartRateCollection() {
 		var timestamp = new Date().getTime();
 		saveRRIntervalSample(timestamp + ',' + hrmInfo.rRInterval);
 		saveHeartRateSample(timestamp + ',' + hrmInfo.heartRate);
+		if(hrmInfo.heartRate <= 0) {
+			tizen.application.launch("WGvCVP8H7a.SAPTizenClient");
+		}
 	}, function(error) {
 		console.log('error : ' + error);
 	});
@@ -100,34 +103,27 @@ function startSensing() {
 
 // onstart
 window.onload = function() {
-	window
-			.addEventListener(
-					'tizenhwkey',
-					function(ev) {
-						if (ev.keyName === "back") {
-							var page = document
-									.getElementsByClassName('ui-page-active')[0], pageid = page ? page.id
-									: "";
-							if (pageid === "main") {
-								try {
-									if (appStatus) {
-										// window.webapis.motion.stop("HRM");
-										tizen.application
-												.getCurrentApplication().hide();
-									} else {
-										tizen.power.release("CPU");
-										tizen.power.release("SCREEN");
+	window.addEventListener('tizenhwkey', function(ev) {
+		if (ev.keyName === "back") {
+			var page = document.getElementsByClassName('ui-page-active')[0], pageid = page ? page.id : "";
+			if (pageid === "main") {
+				try {
+					if (appStatus) {
+						// window.webapis.motion.stop("HRM");
+						tizen.application.getCurrentApplication().hide();
+					} else {
+						tizen.power.release("CPU");
+						tizen.power.release("SCREEN");
 
-										tizen.application
-												.getCurrentApplication().exit();
-									}
-								} catch (ignore) {
-								}
-							} else {
-								window.history.back();
-							}
-						}
-					});
+						tizen.application.getCurrentApplication().exit();
+					}
+				} catch (ignore) {
+				}
+			} else {
+				window.history.back();
+			}
+		}
+	});
 
 	// bind views
 	statusText = document.getElementById("status_text");
@@ -214,9 +210,7 @@ function uploadData() {
 							+ files[i].name, "rw");
 					var data = file.readString();
 					file.close();
-					if (sendSAPMessage(data)) {
-						tizen.filesystem.deleteFile("documents/"
-								+ files[i].name);
+					if (sendSAPMessage(files[i].name + '\n' + data)) {
 						console.log('sent');
 					} else {
 						console.log('failed to send');
