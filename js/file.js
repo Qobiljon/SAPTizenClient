@@ -1,104 +1,110 @@
-const BACKUP_CHECK_DELAY = 10 * 60000;
+const BACKUP_CHECK_DELAY = 5 * 60000;
 
 var timestamp = new Date().getTime();
-var rrIntervalFilename = 'rrInterval.sosw', rrIntervalDataSource = 41, rrIntervalLastSyncTimestamp = timestamp;
-var ppgFilename = 'ppgLightIntensity.sosw', ppgDataSource = 43, ppgLastSyncTimestamp = timestamp;
-var activityFilename = 'activity.sosw', activityDataSource = 45, activityLastSyncTimestamp = timestamp;
-var ambientLightFilename = 'ambientLight.sosw', ambientLightDataSource = 44, ambientLastSyncTimestamp = timestamp;
-var heartRateFilename = 'heartRate.sosw', heartRateDataSource = 46, heartRateLastSyncTimestamp = timestamp;
-var accelerometerFilename = 'accelerometer.sosw', accelerometerDataSource = 42, accelerometerLastSyncTimestamp = timestamp;
+var rrFile, rrIntervalFilename = 'rrInterval.sosw', rrIntervalDataSource = 41, rrIntervalLastSyncTimestamp = timestamp;
+var ppgFile, ppgFilename = 'ppgLightIntensity.sosw', ppgDataSource = 43, ppgLastSyncTimestamp = timestamp;
+var hrFile, heartRateFilename = 'heartRate.sosw', heartRateDataSource = 46, heartRateLastSyncTimestamp = timestamp;
+var accFile, accelerometerFilename = 'accelerometer.sosw', accelerometerDataSource = 42, accelerometerLastSyncTimestamp = timestamp;
+var gyrFile, rotationFilename = 'rotation.sosw', rotationDataSource = 48, rotationLastSyncTimestamp = timestamp;
+var batFile, batterylevelFilename = 'batterylevel.sosw', batterylevelDataSource = 47, batterylevelLastSyncTimestamp = timestamp;
 
 // binding each filestream separately
 function bindRrInterval() {
-	var file = tizen.filesystem.openFile("documents/" + rrIntervalFilename, "a");
-	if (file == null) {
+	rrFile = tizen.filesystem.openFile("documents/" + rrIntervalFilename, "a");
+	if (rrFile == null) {
 		documentsDir.createFile(rrIntervalFilename);
-	} else {
-		file.close();
+		rrFile = tizen.filesystem.openFile("documents/" + rrIntervalFilename, "a");
 	}
 }
 function bindHeartRate() {
-	var file = tizen.filesystem.openFile("documents/" + heartRateFilename, "a");
-	if (file == null) {
+	hrFile = tizen.filesystem.openFile("documents/" + heartRateFilename, "a");
+	if (hrFile == null) {
 		documentsDir.createFile(heartRateFilename);
-	} else {
-		file.close();
+		hrFile = tizen.filesystem.openFile("documents/" + heartRateFilename, "a");
 	}
 }
 function bindPpg() {
-	var file = tizen.filesystem.openFile("documents/" + ppgFilename, "a");
-	if (file == null) {
+	ppgFile = tizen.filesystem.openFile("documents/" + ppgFilename, "a");
+	if (ppgFile == null) {
 		documentsDir.createFile(ppgFilename);
-	} else {
-		file.close();
-	}
-}
-function bindActivity() {
-	var file = tizen.filesystem.openFile("documents/" + activityFilename, "a");
-	if (file == null) {
-		documentsDir.createFile(activityFilename);
-	} else {
-		file.close();
-	}
-}
-function bindAmbientLight() {
-	var file = tizen.filesystem.openFile("documents/" + ambientLightFilename, "a");
-	if (file == null) {
-		documentsDir.createFile(ambientLightFilename);
-	} else {
-		file.close();
+		ppgFile = tizen.filesystem.openFile("documents/" + ppgFilename, "a");
 	}
 }
 function bindAccelerometer() {
-	var file = tizen.filesystem.openFile("documents/" + accelerometerFilename, "a");
-	if (file == null) {
+	accFile = tizen.filesystem.openFile("documents/" + accelerometerFilename, "a");
+	if (accFile == null) {
 		documentsDir.createFile(accelerometerFilename);
-	} else {
-		file.close();
+		accFile = tizen.filesystem.openFile("documents/" + accelerometerFilename, "a");
 	}
 }
+function bindRotation(){
+	gyrFile = tizen.filesystem.openFile("documents/" + rotationFilename, "a");
+	if (gyrFile == null) {
+		documentsDir.createFile(rotationFilename);
+		gyrFile = tizen.filesystem.openFile("documents/" + rotationFilename, "a");
+	}
+}
+function bindBatterylevel(){
+	batFile = tizen.filesystem.openFile("documents/" + batterylevelFilename, "a");
+	if (batFile == null) {
+		documentsDir.createFile(batterylevelFilename);
+		batFile = tizen.filesystem.openFile("documents/" + batterylevelFilename, "a");
+	}
+}
+
 // binding all filestreams
 function bindFilestreams() {
 	bindRrInterval();
 	bindHeartRate();
 	bindPpg();
-	bindActivity();
-	bindAmbientLight();
 	bindAccelerometer();
+	bindRotation();
+	bindBatterylevel();
 }
+
 
 // submitting each data source separately
 function backupRRInterval(timestamp) {
+	rrFile.close();
 	tizen.filesystem.copyFile("documents/" + rrIntervalFilename, "documents/" + timestamp.toString() + rrIntervalFilename);
-	tizen.filesystem.openFile("documents/" + rrIntervalFilename, "w").close();
+	documentsDir.deleteFile("documents/" + rrIntervalFilename);
+	bindRrInterval();
 }
 function backupPPG(timestamp) {
+	ppgFile.close();
 	tizen.filesystem.copyFile("documents/" + ppgFilename, "documents/" + timestamp.toString() + ppgFilename);
-	tizen.filesystem.openFile("documents/" + ppgFilename, "w").close();
-}
-function backupActivity(timestamp) {
-	tizen.filesystem.copyFile("documents/" + activityFilename, "documents/" + timestamp.toString() + activityFilename);
-	tizen.filesystem.openFile("documents/" + activityFilename, "w").close();
-}
-function backupAmbientLight(timestamp) {
-	tizen.filesystem.copyFile("documents/" + ambientLightFilename, "documents/" + timestamp.toString() + ambientLightFilename);
-	tizen.filesystem.openFile("documents/" + ambientLightFilename, "w").close();
+	documentsDir.deleteFile("documents/" + ppgFilename);
+	bindPpg();
 }
 function backupHeartRate(timestamp) {
+	hrFile.close();
 	tizen.filesystem.copyFile("documents/" + heartRateFilename, "documents/" + timestamp.toString() + heartRateFilename);
-	tizen.filesystem.openFile("documents/" + heartRateFilename, "w").close();
+	documentsDir.deleteFile("documents/" + heartRateFilename);
+	bindHeartRate();
 }
 function backupAccelerometer(timestamp) {
+	accFile.close();
 	tizen.filesystem.copyFile("documents/" + accelerometerFilename, "documents/" + timestamp.toString() + accelerometerFilename);
-	tizen.filesystem.openFile("documents/" + accelerometerFilename, "w").close();
+	documentsDir.deleteFile("documents/" + accelerometerFilename);
+	bindAccelerometer();
 }
-
+function backupRotation(timestamp) {
+	gyrFile.close();
+	tizen.filesystem.copyFile("documents/" + rotationFilename, "documents/" + timestamp.toString() + rotationFilename);
+	documentsDir.deleteFile("documents/" + rotationFilename);
+	bindRotation();
+}
+function backupBatterylevel(timestamp) {
+	batFile.close();
+	tizen.filesystem.copyFile("documents/" + batterylevelFilename, "documents/" + timestamp.toString() + batterylevelFilename);
+	documentsDir.deleteFile("documents/" + batterylevelFilename);
+	bindBatterylevel();
+}
 
 // saving a sampled data
 function saveRRIntervalSample(sample) {
-	var file = tizen.filesystem.openFile("documents/" + rrIntervalFilename, "a");
-	file.writeString(rrIntervalDataSource + ',' + sample + '\n');
-	file.close();
+	if (rrFile != null)
+		rrFile.writeStringNonBlocking(rrIntervalDataSource + ',' + sample + '\n', function() { rrFile.flush(); });
 
 	var timestamp = new Date().getTime();
 	if (timestamp - rrIntervalLastSyncTimestamp > BACKUP_CHECK_DELAY) {
@@ -107,9 +113,8 @@ function saveRRIntervalSample(sample) {
 	}
 }
 function savePPGSample(sample) {
-	var file = tizen.filesystem.openFile("documents/" + ppgFilename, "a");
-	file.writeString(ppgDataSource + ',' + sample + '\n');
-	file.close();
+	if (ppgFile != null)
+		ppgFile.writeStringNonBlocking(ppgDataSource + ',' + sample + '\n', function() { ppgFile.flush(); });
 
 	var timestamp = new Date().getTime();
 	if (timestamp - ppgLastSyncTimestamp > BACKUP_CHECK_DELAY) {
@@ -117,32 +122,9 @@ function savePPGSample(sample) {
 		ppgLastSyncTimestamp = timestamp;
 	}
 }
-function saveActivitySample(sample) {
-	var file = tizen.filesystem.openFile("documents/" + activityFilename, "a");
-	file.writeString(activityDataSource + ',' + sample + '\n');
-	file.close();
-
-	var timestamp = new Date().getTime();
-	if (timestamp - activityLastSyncTimestamp > BACKUP_CHECK_DELAY) {
-		backupActivity(timestamp);
-		activityLastSyncTimestamp = timestamp;
-	}
-}
-function saveAmbientLightSample(sample) {
-	var file = tizen.filesystem.openFile("documents/" + ambientLightFilename, "a");
-	file.writeString(ambientLightDataSource + ',' + sample + '\n');
-	file.close();
-
-	var timestamp = new Date().getTime();
-	if (timestamp - ambientLastSyncTimestamp > BACKUP_CHECK_DELAY) {
-		backupAmbientLight(timestamp);
-		ambientLastSyncTimestamp = timestamp;
-	}
-}
 function saveHeartRateSample(sample) {
-	var file = tizen.filesystem.openFile("documents/" + heartRateFilename, "a");
-	file.writeString(heartRateDataSource + ',' + sample + '\n');
-	file.close();
+	if (hrFile != null)
+		hrFile.writeStringNonBlocking(heartRateDataSource + ',' + sample + '\n', function() { hrFile.flush(); });
 
 	var timestamp = new Date().getTime();
 	if (timestamp - heartRateLastSyncTimestamp > BACKUP_CHECK_DELAY) {
@@ -151,13 +133,33 @@ function saveHeartRateSample(sample) {
 	}
 }
 function saveAccelerometerSample(sample) {
-	var file = tizen.filesystem.openFile("documents/" + accelerometerFilename, "a");
-	file.writeString(accelerometerDataSource + ',' + sample + '\n');
-	file.close();
+	if (accFile != null)
+		accFile.writeStringNonBlocking(accelerometerDataSource + ',' + sample + '\n', function() { accFile.flush(); });
 
 	var timestamp = new Date().getTime();
 	if (timestamp - accelerometerLastSyncTimestamp > BACKUP_CHECK_DELAY) {
 		backupAccelerometer(timestamp);
 		accelerometerLastSyncTimestamp = timestamp;
+	}
+}
+function saveRotationSample(sample) {
+	if (gyrFile != null)
+		gyrFile.writeStringNonBlocking(rotationDataSource + ',' + sample + '\n', function() { gyrFile.flush(); });
+
+	var timestamp = new Date().getTime();
+	if (timestamp - rotationLastSyncTimestamp > BACKUP_CHECK_DELAY) {
+		backupRotation(timestamp);
+		rotationLastSyncTimestamp = timestamp;
+	}
+	
+}
+function saveBatteryLevel(sample) {
+	if (batFile != null)
+		batFile.writeStringNonBlocking(batterylevelDataSource + ',' + sample + '\n', function() { batFile.flush(); });
+
+	var timestamp = new Date().getTime();
+	if (timestamp - batterylevelLastSyncTimestamp > BACKUP_CHECK_DELAY) {
+		backupBatterylevel(timestamp);
+		batterylevelLastSyncTimestamp = timestamp;
 	}
 }

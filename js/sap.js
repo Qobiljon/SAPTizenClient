@@ -100,10 +100,10 @@ function sendSAPMessage(data) {
 
 function onreceive(channelId, data) {
 	if (data === "upload data") {
-		// console.log('file delete request received');
+		console.log('file upload request received');
 		uploadData();
 	} else if (data.startsWith('delete ')) {
 		// console.log('file delete request received');
-		tizen.filesystem.deleteFile("documents/" + data.split(' ')[1]);
+		// tizen.filesystem.deleteFile("documents/" + data.split(' ')[1]);
 	}
 }

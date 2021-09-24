@@ -15,6 +15,12 @@ function startHeartRateCollection() {
 		var timestamp = new Date().getTime();
 		saveRRIntervalSample(timestamp + ',' + hrmInfo.rRInterval);
 		saveHeartRateSample(timestamp + ',' + hrmInfo.heartRate);
+		tizen.systeminfo.getPropertyValue("BATTERY", function (batteryInfo) {
+			var timestamp = new Date().getTime();
+			var isCharging = batteryInfo.isCharging;
+		    var batteryLevel = (batteryInfo.level * 100);
+		    saveBatteryLevel(timestamp + "," + isCharging + "," + batteryLevel);
+		});
 		if(hrmInfo.heartRate <= 0) {
 			tizen.application.launch("WGvCVP8H7a.SAPTizenClient");
 		}
@@ -42,8 +48,7 @@ function startHRMRawCollection() {
 	// console.log('HRM Raw collection started');
 }
 function startLinearAccelerationCollection() {
-	linearAccelerationSensor = tizen.sensorservice
-			.getDefaultSensor("LINEAR_ACCELERATION");
+	linearAccelerationSensor = tizen.sensorservice.getDefaultSensor("LINEAR_ACCELERATION");
 	linearAccelerationSensor.start(function() {
 		var listener = function(accData) {
 			var timestamp = new Date().getTime();
@@ -53,50 +58,54 @@ function startLinearAccelerationCollection() {
 			// console.log('error : ' + error);
 		};
 		linearAccelerationSensor.getLinearAccelerationSensorData(listener, onerror);
-		linearAccelerationSensor.setChangeListener(listener, 50);
+		linearAccelerationSensor.setChangeListener(listener, 10);
 	});
 	// console.log('Linear acc collection started');
 }
-function startAmbientLightCollection() {
-	lightSensor = tizen.sensorservice.getDefaultSensor("LIGHT");
-	lightSensor.start(function() {
-		var listener = function(lightData) {
+function startGeneralLoggingCollection() {
+//	var rate = 1000;
+//	var interval = window.setInterval(function(){
+//		tizen.systeminfo.getPropertyValue("BATTERY", function (batteryInfo) {
+//			var timestamp = new Date().getTime();
+//			var isCharging = batteryInfo.isCharging;
+//		    var batteryLevel = (batteryInfo.level * 100);
+//		    saveBatteryLevel(timestamp + "," + isCharging + "," + batteryLevel);
+//		});
+//	}, rate);
+}
+function startRotationCollection() {
+	rotationSensor = tizen.sensorservice.getDefaultSensor("GYROSCOPE_ROTATION_VECTOR");
+	rotationSensor.start(function() {
+		var listener = function(rotationData) {
 			var timestamp = new Date().getTime();
-			saveAmbientLightSample(timestamp + "," + lightData.lightLevel);
+			saveRotationSample(timestamp + "," + rotationData.x + "," + rotationData.y + "," + rotationData.z, + "," + rotationData.w);
 		};
 		var onerror = function(error) {
 			// console.log('error : ' + error);
 		};
-		lightSensor.getLightSensorData(listener, onerror);
-		lightSensor.setChangeListener(listener, 1000);
+		rotationSensor.setChangeListener(listener, 10);
 	});
-	// console.log('Ambient light sensor start');
 }
-function startActivityDetection() {
-	var listener = function(activityInfo) {
-		// console.log('Activity');
-		var timestamp = new Date().getTime();
-		saveActivitySample(timestamp + "," + activityInfo.type);
-	};
-	var onerror = function(error) {
-		// console.log('error : ' + error.message);
-	};
-	listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('WALKING', listener, onerror);
-	listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('RUNNING', listener, onerror);
-	listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('STATIONARY', listener, onerror);
-	listenerIdWalking = tizen.humanactivitymonitor.addActivityRecognitionListener('IN_VEHICLE', listener, onerror);
+function startEnvironmentalSoundCollection() {
+	
 }
+
 // sensing overall
 function startSensing() {
 	startHeartRateCollection();
 	startHRMRawCollection();
 	startLinearAccelerationCollection();
-	startAmbientLightCollection();
-	startActivityDetection();
+	startRotationCollection();
+	startGeneralLoggingCollection();
+	startEnvironmentalSoundCollection();
+	
+	// startAmbientLightCollection();
+	// startActivityDetection();
 }
 
 // onstart
 window.onload = function() {
+	
 	window.addEventListener('tizenhwkey', function(ev) {
 		if (ev.keyName === "back") {
 			var page = document.getElementsByClassName('ui-page-active')[0], pageid = page ? page.id : "";
@@ -203,6 +212,7 @@ function uploadData() {
 					file.close();
 					if (sendSAPMessage(files[i].name + '\n' + data)) {
 						// console.log('sent');
+						tizen.filesystem.deleteFile("documents/" + files[i].name);
 					} else {
 						// console.log('failed to send');
 					}

@@ -25,4 +25,9 @@
     <tizen:privilege name="http://tizen.org/privilege/power"/>
     
     <feature name="http://tizen.org/feature/sensor.heart_rate_monitor"/>
+    <feature name="http://tizen.org/feature/sensor.gyroscope" />
+    <feature name="http://tizen.org/feature/sensor.gyroscope_rotation_vector" />
+    <feature name="http://tizen.org/feature/sensor.magnetometer" />
+    <feature name="http://tizen.org/feature/sensor.gravity" />
+    <feature name="http://tizen.org/feature/sensor.accelerometer" />
 </widget>
